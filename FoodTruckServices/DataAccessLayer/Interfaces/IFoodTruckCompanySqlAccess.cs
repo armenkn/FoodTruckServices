@@ -13,5 +13,11 @@ namespace FoodTruckServices.DataAccessLayer
         int CreateFoodTruckCompany(FoodTruckCompany foodTruckCompany);
 
         void InsertWorkDayHour(WorkingDayHour workingDayHour);
+
+        void UpdateFoodTruckCompany(FoodTruckCompany foodTruckCompany);
+
+        List<FoodTruckCompany> SearchFoodTruckCompany(FoodTruckCompanySearchCriteria criteria);
+        
+           void DeactivateFoodTruckCompany(int foodTruckCompanyId);
     }
 }

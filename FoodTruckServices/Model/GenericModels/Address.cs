@@ -25,12 +25,8 @@ namespace FoodTruckServices.Model
         [StringLength(2, MinimumLength = 2, ErrorMessage = Constants.Errors.InvalidState)]
         public string State { get; set; }
 
-        public decimal Latitude { get; set; }
-
-        public decimal Longitude { get; set; }
-
-        public AddressTypeEnum AddressType { get; set; }
-
+        public Coordination Coordination{ get; set; }
         
+        public AddressTypeEnum AddressType { get; set; }
     }
 }

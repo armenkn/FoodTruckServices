@@ -10,6 +10,8 @@ using Microsoft.Extensions.Logging;
 using Autofac;
 using FoodTruckServices.DataAccessLayer;
 using FoodTruckServices.DataAccessLayer.Implementations;
+using FoodTruckServices.Interfaces;
+using FoodTruckServices.BusinessLayer.Implementations;
 
 namespace FoodTruckServices
 {
@@ -50,8 +52,10 @@ namespace FoodTruckServices
             //container.Resolve<IDataAccess>();
             //container.Resolve<IFoodTruckCompanySqlAccess>();
 
-            services.AddTransient<IDataAccess, DataAccessImplementation>();
+            services.AddTransient<IBusiness, BusinessLayerImplementation>();
             services.AddTransient<IFoodTruckCompanySqlAccess, FoodTruckCompanySqlAccessImplementation>();
+            services.AddTransient<IFoodTruckSqlAccess, FoodTruckSqlAccessImplementation>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

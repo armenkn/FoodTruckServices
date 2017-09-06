@@ -139,11 +139,13 @@ namespace FoodTruckServices.DataAccessLayer.Implementations
                         address.Address2 = reader["Address2"].ToString();
                         address.AddressType = (AddressTypeEnum)int.Parse(reader["AddressTypeId"].ToString());
                         address.City = reader["City"].ToString();
-                        var latitude = reader["Latitude"].ToString();
-                        address.Latitude = (!string.IsNullOrEmpty(latitude)) ? decimal.Parse(latitude) : 0;
 
-                        var longitude = reader["Longitude"].ToString();
-                        address.Longitude = (!string.IsNullOrEmpty(longitude)) ? decimal.Parse(longitude) : 0;
+                        address.Coordination = new Coordination();
+                        var latitude = reader["Latitude"].ToString();
+                        address.Coordination.Latitude = (!string.IsNullOrEmpty(latitude)) ? decimal.Parse(latitude) : 0;
+
+                        var longitude = reader["Longitude"].ToString();                        
+                        address.Coordination.Longitude = (!string.IsNullOrEmpty(longitude)) ? decimal.Parse(longitude) : 0;
 
                         address.State = reader["State"].ToString();
                         address.Zipcode = reader["Zipcode"].ToString();
@@ -294,5 +296,21 @@ namespace FoodTruckServices.DataAccessLayer.Implementations
                 }
             }
         }
+
+        public List<FoodTruckCompany> SearchFoodTruckCompany(FoodTruckCompanySearchCriteria criteria)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void UpdateFoodTruckCompany(FoodTruckCompany foodTruckCompany)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DeactivateFoodTruckCompany(int foodTruckCompanyId)
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }
