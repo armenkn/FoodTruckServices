@@ -3,7 +3,7 @@ using FoodTruckServices.Model;
 using FoodTruckServices.Interfaces;
 using FoodTruckServices.DataAccessLayer;
 
-namespace FoodTruckServices.BusinessLayer.Implementations
+namespace FoodTruckServices
 {
     public class BusinessLayerImplementation : IBusiness
     {
@@ -11,7 +11,9 @@ namespace FoodTruckServices.BusinessLayer.Implementations
         private readonly IFoodTruckSqlAccess _foodTruckSqlAccess;
         private readonly IAddressSqlAccess _addressSqlAccess;
         private readonly ICoordinationServiceProvider _coordinationServiceProvider;
-        public BusinessLayerImplementation(IFoodTruckCompanySqlAccess foodTruckCompanySqlAccess, IFoodTruckSqlAccess foodTruckSqlAccess, IAddressSqlAccess addressSqlAccess, ICoordinationServiceProvider coordinationServiceProvider)
+        public BusinessLayerImplementation(IFoodTruckCompanySqlAccess foodTruckCompanySqlAccess, 
+            IFoodTruckSqlAccess foodTruckSqlAccess, IAddressSqlAccess addressSqlAccess,
+            ICoordinationServiceProvider coordinationServiceProvider)
         {
             _foodTruckCompanySqlAccess = foodTruckCompanySqlAccess;
             _foodTruckSqlAccess = foodTruckSqlAccess;
@@ -47,7 +49,7 @@ namespace FoodTruckServices.BusinessLayer.Implementations
 
         public List<FoodTruckCompany> SearchFoodTruckCompany(FoodTruckCompanySearchCriteria criteria)
         {
-            throw new System.NotImplementedException();
+            return _foodTruckCompanySqlAccess.SearchFoodTruckCompany(criteria);
         }
 
         public void UpdateFoodTruckCompany(FoodTruckCompany foodTruckCompany)
@@ -91,7 +93,7 @@ namespace FoodTruckServices.BusinessLayer.Implementations
 
         public int CreateAddress(Address address)
         {
-            if(address.Coordination?.Latitude == 0 && address.Coordination?.Longitude == 0)
+            if (address.Coordination?.Latitude == 0 && address.Coordination?.Longitude == 0)
             {
                 var coordination = _coordinationServiceProvider.GetLatAndLongByAddress(address);
                 address.Coordination = coordination;

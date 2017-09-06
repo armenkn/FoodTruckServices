@@ -11,24 +11,24 @@ namespace FoodTruckServices.Controllers
     [Route("api/[controller]")]
     public class FoodTruckCompanyController : Controller
     {
-        private readonly IBusiness _dataAccess;
+        private readonly IBusiness _businessLayer;
         private const string _resourceUrl = "/api/FoodTruckCompany/";
-        public FoodTruckCompanyController(IBusiness dataAccess)
+        public FoodTruckCompanyController(IBusiness businessLayer)
         {
-            _dataAccess = dataAccess;
+            _businessLayer = businessLayer;
         }
 
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
-           var foodTruckCompany = _dataAccess.GetFoodTruckCompanyById(id);
+            var foodTruckCompany = _businessLayer.GetFoodTruckCompanyById(id);
             return Ok(foodTruckCompany);
         }
 
         [HttpPost]
         public IActionResult Post([FromBody]FoodTruckCompany foodTruckCompany)
         {
-            var foodTruckCompanyId = _dataAccess.CreateFoodTruckCompany(foodTruckCompany);
+            var foodTruckCompanyId = _businessLayer.CreateFoodTruckCompany(foodTruckCompany);
             return Created($"{_resourceUrl}{foodTruckCompanyId}", foodTruckCompanyId);
         }
 
@@ -40,24 +40,24 @@ namespace FoodTruckServices.Controllers
         [HttpPut]
         public IActionResult Put([FromBody]FoodTruckCompany foodTruckCompany)
         {
-            _dataAccess.UpdateFoodTruckCompany(foodTruckCompany);
+            _businessLayer.UpdateFoodTruckCompany(foodTruckCompany);
             return Ok();
         }
 
         /// <summary>
         /// Get a list of all FTC basic info
         /// </summary>
-        [HttpGet]
-        public IActionResult Search([FromBody]FoodTruckCompanySearchCriteria criteria)
-        {            
-            var searchResult = _dataAccess.SearchFoodTruckCompany(criteria);            
+        [HttpGet("search")]
+        public IActionResult Search(FoodTruckCompanySearchCriteria criteria)
+        {
+            var searchResult = _businessLayer.SearchFoodTruckCompany(criteria);
             return Ok(searchResult);
         }
-        
+
         [HttpPut("{id}/Deactivate")]
         public IActionResult Deactivate(int id)
         {
-            _dataAccess.DeactivateFoodTruckCompany(id);
+            _businessLayer.DeactivateFoodTruckCompany(id);
             return Ok();
 
         }

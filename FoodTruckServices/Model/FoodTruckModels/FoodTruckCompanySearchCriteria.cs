@@ -15,6 +15,10 @@ namespace FoodTruckServices.Model
 
         public string City{ get; set; }
 
-        public AreaCoordination Coordination { get; set; }
+        public decimal Latitude { get; set; }
+
+        public decimal Longitude { get; set; }
+
+        public float Radius { get; set; }
     }
 }
