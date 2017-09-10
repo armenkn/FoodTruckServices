@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using FoodTruckServices.DataAccessLayer;
 using FoodTruckServices.Model;
 using FoodTruckServices.Interfaces;
+using System.Net;
+using Microsoft.AspNetCore.Http;
 
 namespace FoodTruckServices.Controllers
 {
@@ -23,15 +25,18 @@ namespace FoodTruckServices.Controllers
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
-            Address Address = _dataAccess.GetAddressById(id);
-            return Ok(Address);
+            Address address = _dataAccess.GetAddressById(id);
+            if (address != null && address.AddressID != 0)
+                return Ok(address);
+            else
+                return NotFound();
         }
 
 
         [HttpPost]
-        public IActionResult Post([FromBody]Address address)
+        public async Task<IActionResult> Post([FromBody]Address address)
         {
-            int AddressId = _dataAccess.CreateAddress(address);
+            int AddressId = await _dataAccess.CreateAddress(address);
             return Created($"{_resourceUrl}{AddressId}", AddressId);
         }
 
@@ -40,12 +45,36 @@ namespace FoodTruckServices.Controllers
         /// </summary>
         /// <param name="address"></param>
         /// <returns></returns>
-        [HttpPut]
-        public IActionResult Put([FromBody]Address address)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Put(int id, [FromBody]Address address)
         {
             _dataAccess.UpdateAddress(address);
             return Ok();
         }
 
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
+        {
+            var databaseResponse = DatabaseResponse.None;
+            databaseResponse = _dataAccess.DeleteAddress(id);
+            var response = new ContentResult();
+
+            switch (databaseResponse)
+            {
+                case DatabaseResponse.None:
+                    response.StatusCode = StatusCodes.Status500InternalServerError;
+                    return response;
+                case DatabaseResponse.Success:
+                    return Ok();
+                case DatabaseResponse.CannotDelete:
+                    response.StatusCode = StatusCodes.Status409Conflict;
+                    response.Content = "Cannot delete address";
+                    return response;
+                default:
+                    response.StatusCode = StatusCodes.Status500InternalServerError;
+                    return response;
+            }
+
+        }
     }
 }

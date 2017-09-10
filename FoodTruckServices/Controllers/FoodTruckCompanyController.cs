@@ -37,9 +37,10 @@ namespace FoodTruckServices.Controllers
         /// </summary>
         /// <param name="foodTruckCompany"></param>
         /// <returns></returns>
-        [HttpPut]
-        public IActionResult Put([FromBody]FoodTruckCompany foodTruckCompany)
+        [HttpPut("{id}")]
+        public IActionResult Put(int id, [FromBody]FoodTruckCompany foodTruckCompany)
         {
+            foodTruckCompany.FoodTruckCompanyId = id;
             _businessLayer.UpdateFoodTruckCompany(foodTruckCompany);
             return Ok();
         }
@@ -53,14 +54,5 @@ namespace FoodTruckServices.Controllers
             var searchResult = _businessLayer.SearchFoodTruckCompany(criteria);
             return Ok(searchResult);
         }
-
-        [HttpPut("{id}/Deactivate")]
-        public IActionResult Deactivate(int id)
-        {
-            _businessLayer.DeactivateFoodTruckCompany(id);
-            return Ok();
-
-        }
-
     }
 }

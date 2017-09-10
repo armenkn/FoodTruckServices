@@ -105,6 +105,108 @@ namespace FoodTruckServices.DataAccessLayer.Implementations
             return result;
         }
 
+        public void InsertWorkDayHour(WorkingDayHour workingDayHour)
+        {
+            using (var sqlConn = new SqlConnection(Utilities.GetDefaultConnectionString()))
+            {
+                var spName = "InsertWorkingDayHour";
+                using (var cmd = new SqlCommand(spName, sqlConn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.AddWithValue("@DayOfWeek", workingDayHour.DayOfWeek.ToString());
+                    cmd.Parameters.AddWithValue("@OpenTimeHours", workingDayHour.OpenTime.Hours);
+                    cmd.Parameters.AddWithValue("@OpenTimeMinutes", workingDayHour.OpenTime.Minutes);
+                    cmd.Parameters.AddWithValue("@CloseTimeHours", workingDayHour.CloseTime.Hours);
+                    cmd.Parameters.AddWithValue("@CloseTimeMinutes", workingDayHour.CloseTime.Minutes);
+                    cmd.Parameters.AddWithValue("@UserId", 1);
+
+                    sqlConn.Open();
+                    cmd.ExecuteNonQuery();
+
+                }
+            }
+        }
+
+        public List<FoodTruckCompany> SearchFoodTruckCompany(FoodTruckCompanySearchCriteria criteria)
+        {
+            var result = new List<FoodTruckCompany>();
+            using (var sqlConn = new SqlConnection(Utilities.GetDefaultConnectionString()))
+            {
+                var spName = "SearchFoodTruckCompanies";
+                using (var cmd = new SqlCommand(spName, sqlConn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@BusinessName", criteria.BusinessName);
+                    cmd.Parameters.AddWithValue("@Zipcode", criteria.Zipcode);
+                    cmd.Parameters.AddWithValue("@City", criteria.City);
+                    if (criteria.Latitude != 0)
+                        cmd.Parameters.AddWithValue("@Latitude", criteria.Latitude);
+                    if (criteria.Longitude != 0)
+                        cmd.Parameters.AddWithValue("@Longiture", criteria.Longitude);
+                    if (criteria.Radius != 0)
+                        cmd.Parameters.AddWithValue("@Radius", criteria.Radius);
+
+                    sqlConn.Open();
+                    var reader = cmd.ExecuteReader();
+
+                    while (reader.HasRows)
+                    {
+                        var ftcItem = new FoodTruckCompany();
+                        ReadFoodTrackCompanyInfoFromReader(ftcItem, reader);
+                        result.Add(ftcItem);
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        public void UpdateFoodTruckCompany(FoodTruckCompany foodTruckCompany)
+        {
+            var result = new List<FoodTruckCompany>();
+            using (var sqlConn = new SqlConnection(Utilities.GetDefaultConnectionString()))
+            {
+                var spName = "UpdateFoodTruckCompany";
+                using (var cmd = new SqlCommand(spName, sqlConn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@FoodTruckCompanyID", foodTruckCompany.FoodTruckCompanyId);
+                    cmd.Parameters.AddWithValue("@BusinessName", foodTruckCompany.BusinessName);
+                    cmd.Parameters.AddWithValue("@Description", foodTruckCompany.Description);
+                    cmd.Parameters.AddWithValue("@CompanyTypeID", (int)foodTruckCompany.CompanyType);
+                    cmd.Parameters.AddWithValue("@PermitNumber", foodTruckCompany.PermitNumber);
+                    cmd.Parameters.AddWithValue("@HealthCode", foodTruckCompany.HealthCode);
+                    cmd.Parameters.AddWithValue("@HasCatering", foodTruckCompany.HasCatering);
+                    cmd.Parameters.AddWithValue("@HasVegeterianFood", foodTruckCompany.HasVegeterianFood);
+                    cmd.Parameters.AddWithValue("@HasVigenFood", foodTruckCompany.HasVigenFood);
+                    if (foodTruckCompany.AdditionalInfo != null && foodTruckCompany.AdditionalInfo.Count > 0)
+                    {
+                        cmd.Parameters.AddWithValue("@AdditionalInfo", Utilities.SerializeObjectToJson(foodTruckCompany.AdditionalInfo));
+                    }
+                    if (foodTruckCompany.AreaOfOperation != null && foodTruckCompany.AreaOfOperation.Count > 0)
+                    {
+                        cmd.Parameters.AddWithValue("@AreaOfOperation", foodTruckCompany.AreaOfOperation);
+                    }
+                    if (foodTruckCompany.MealTypes != null && foodTruckCompany.MealTypes.Count > 0)
+                    {
+                        cmd.Parameters.AddWithValue("@MealTypeIDs", string.Join(",", foodTruckCompany.MealTypes.Select(x => (int)x).ToList()));
+                    }
+                    if (foodTruckCompany.CuisineCategories != null && foodTruckCompany.CuisineCategories.Count > 0)
+                    {
+                        cmd.Parameters.AddWithValue("@CuisineCategoryIDs", string.Join(",", foodTruckCompany.CuisineCategories.Select(x => (int)x).ToList()));
+                    }
+                    cmd.Parameters.AddWithValue("@UserId", Constants.UserId);
+
+                    sqlConn.Open();
+                    cmd.ExecuteNonQuery();
+
+                }
+            }
+        }
+        
+
+        #region Private methods
         private static void ReadFoodTrackCompanyInfoFromReader(FoodTruckCompany result, SqlDataReader reader)
         {
             while (reader.Read())
@@ -282,72 +384,7 @@ namespace FoodTruckServices.DataAccessLayer.Implementations
 
         }
 
-        public void InsertWorkDayHour(WorkingDayHour workingDayHour)
-        {
-            using (var sqlConn = new SqlConnection(Utilities.GetDefaultConnectionString()))
-            {
-                var spName = "InsertWorkingDayHour";
-                using (var cmd = new SqlCommand(spName, sqlConn))
-                {
-                    cmd.CommandType = CommandType.StoredProcedure;
-
-                    cmd.Parameters.AddWithValue("@DayOfWeek", workingDayHour.DayOfWeek.ToString());
-                    cmd.Parameters.AddWithValue("@OpenTimeHours", workingDayHour.OpenTime.Hours);
-                    cmd.Parameters.AddWithValue("@OpenTimeMinutes", workingDayHour.OpenTime.Minutes);
-                    cmd.Parameters.AddWithValue("@CloseTimeHours", workingDayHour.CloseTime.Hours);
-                    cmd.Parameters.AddWithValue("@CloseTimeMinutes", workingDayHour.CloseTime.Minutes);
-                    cmd.Parameters.AddWithValue("@UserId", 1);
-
-                    sqlConn.Open();
-                    cmd.ExecuteNonQuery();
-
-                }
-            }
-        }
-
-        public List<FoodTruckCompany> SearchFoodTruckCompany(FoodTruckCompanySearchCriteria criteria)
-        {
-            var result = new List<FoodTruckCompany>();
-            using (var sqlConn = new SqlConnection(Utilities.GetDefaultConnectionString()))
-            {
-                var spName = "SearchFoodTruckCompanies";
-                using (var cmd = new SqlCommand(spName, sqlConn))
-                {
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@BusinessName", criteria.BusinessName);
-                    cmd.Parameters.AddWithValue("@Zipcode", criteria.Zipcode);
-                    cmd.Parameters.AddWithValue("@City", criteria.City);
-                    if(criteria.Latitude != 0)
-                        cmd.Parameters.AddWithValue("@Latitude", criteria.Latitude);
-                    if(criteria.Longitude != 0)
-                        cmd.Parameters.AddWithValue("@Longiture", criteria.Longitude);
-                    if (criteria.Radius != 0)
-                        cmd.Parameters.AddWithValue("@Radius", criteria.Radius);
-
-                    sqlConn.Open();
-                    var reader = cmd.ExecuteReader();
-
-                    while (reader.HasRows)
-                    {
-                        var ftcItem = new FoodTruckCompany();
-                        ReadFoodTrackCompanyInfoFromReader(ftcItem, reader);
-                        result.Add(ftcItem);
-                    }
-                }
-            }
-
-            return result;
-        }
-
-        public void UpdateFoodTruckCompany(FoodTruckCompany foodTruckCompany)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void DeactivateFoodTruckCompany(int foodTruckCompanyId)
-        {
-            throw new NotImplementedException();
-        }
+        #endregion
 
     }
 }

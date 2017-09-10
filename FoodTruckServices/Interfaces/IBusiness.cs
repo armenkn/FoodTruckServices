@@ -12,7 +12,6 @@ namespace FoodTruckServices.Interfaces
         int CreateFoodTruckCompany(FoodTruckCompany foodTruckCompany);
         void InsertWorkDayHour(WorkingDayHour workingDayHour);
         void UpdateFoodTruckCompany(FoodTruckCompany foodTruckCompany);
-        void DeactivateFoodTruckCompany(int foodTruckCompanyId);
         List<FoodTruckCompany> SearchFoodTruckCompany(FoodTruckCompanySearchCriteria criteria);
 
         FoodTruck GetFoodTruckById(int foodTruckId);
@@ -23,7 +22,8 @@ namespace FoodTruckServices.Interfaces
         
 
         Address GetAddressById(int addressId);
-        int CreateAddress(Address address);        
-        void UpdateAddress(Address address);        
+        Task<int> CreateAddress(Address address);        
+        void UpdateAddress(Address address);
+        DatabaseResponse DeleteAddress(int id);
     }
 }

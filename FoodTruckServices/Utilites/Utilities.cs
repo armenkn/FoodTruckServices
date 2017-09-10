@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using FoodTruckServices.Model;
+using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.IO;
@@ -18,7 +19,7 @@ namespace FoodTruckServices
         {
             return JsonConvert.SerializeObject(toSerialize);
         }
-        
+
         public static string SerializeObjectToXml<T>(this T toSerialize)
         {
             var xmlSerializer = new XmlSerializer(toSerialize.GetType());
@@ -43,5 +44,17 @@ namespace FoodTruckServices
 
             return result;
         }
+
+        public static string ToAddressString(this Address address)
+        {
+            var result = address.Address1.Replace(' ', '+') + "+";
+            result += address.Address2?.Replace(' ', '+') + "+";
+            result += address.City.Replace(' ', '+') + "+";
+            result += address.State.Replace(' ', '+') + "+";
+            result += address.Zipcode;
+
+            return result;
+        }
     }
 }
+

@@ -5,6 +5,12 @@ namespace FoodTruckServices.Model
     {
         //todo: replace
         public static int UserId = 1;
+
+        public static string GoogleMapApiKey = "AIzaSyAfQ3Ga_MtLW7pc6ZejXVYhSpawbD9s4UY";
+
+        public static string GoogleMapApiUrl = "https://maps.googleapis.com/maps/api/geocode/json?address={0}&key=" + GoogleMapApiKey;
+
+
         public static class Errors
         {
             public const string InvaidFirstName = "First name is invalid";

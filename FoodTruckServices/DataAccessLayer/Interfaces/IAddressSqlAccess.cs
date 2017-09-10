@@ -11,6 +11,6 @@ namespace FoodTruckServices.DataAccessLayer
         Address GetAddressById(int id);
         int CreateAddress(Address address);
         void UpdateAddress(Address address);
-
+        DatabaseResponse DeleteAddress(int id);
     }
 }

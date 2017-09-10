@@ -1,9 +1,10 @@
 ﻿using FoodTruckServices.Model;
+using System.Threading.Tasks;
 
 namespace FoodTruckServices.Interfaces
 {
     public interface ICoordinationServiceProvider
     {
-        Coordination GetLatAndLongByAddress(Address address);
+       Task<Coordination> GetLatAndLongByAddress(Address address);
     }
 }

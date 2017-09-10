@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using FoodTruckServices.DataAccessLayer;
 using FoodTruckServices.DataAccessLayer.Implementations;
 using FoodTruckServices.Interfaces;
+using FoodTruckServices.ExternalServices;
 
 namespace FoodTruckServices
 {

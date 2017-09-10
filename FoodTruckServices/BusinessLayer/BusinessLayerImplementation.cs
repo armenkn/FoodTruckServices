@@ -2,6 +2,7 @@
 using FoodTruckServices.Model;
 using FoodTruckServices.Interfaces;
 using FoodTruckServices.DataAccessLayer;
+using System.Threading.Tasks;
 
 namespace FoodTruckServices
 {
@@ -32,12 +33,7 @@ namespace FoodTruckServices
         {
             return _foodTruckCompanySqlAccess.CreateFoodTruckCompany(foodTruckCompany);
         }
-
-        public void DeactivateFoodTruckCompany(int foodTruckCompanyId)
-        {
-            _foodTruckCompanySqlAccess.DeactivateFoodTruckCompany(foodTruckCompanyId);
-        }
-
+        
         public FoodTruckCompany GetFoodTruckCompanyById(int foodTruckCompanyId)
         {
             if (foodTruckCompanyId == 0)
@@ -91,19 +87,31 @@ namespace FoodTruckServices
             return _addressSqlAccess.GetAddressById(addressId);
         }
 
-        public int CreateAddress(Address address)
+        public async Task<int> CreateAddress(Address address)
         {
-            if (address.Coordination?.Latitude == 0 && address.Coordination?.Longitude == 0)
+            if (address.Coordination == null ||
+                (address.Coordination?.Latitude == null && address.Coordination?.Longitude == null))
             {
                 var coordination = _coordinationServiceProvider.GetLatAndLongByAddress(address);
-                address.Coordination = coordination;
+                address.Coordination = await coordination;
             }
             return _addressSqlAccess.CreateAddress(address);
         }
 
-        public void UpdateAddress(Address address)
+        public async void UpdateAddress(Address address)
         {
+            if (address.Coordination == null ||
+                (address.Coordination?.Latitude == null && address.Coordination?.Longitude == null))
+            {
+                var coordination = _coordinationServiceProvider.GetLatAndLongByAddress(address);
+                address.Coordination = await coordination;
+            }
             _addressSqlAccess.UpdateAddress(address);
+        }
+
+        public DatabaseResponse DeleteAddress(int id)
+        {
+            return _addressSqlAccess.DeleteAddress(id);
         }
 
         #endregion

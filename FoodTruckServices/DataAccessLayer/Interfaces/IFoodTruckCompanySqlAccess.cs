@@ -17,7 +17,5 @@ namespace FoodTruckServices.DataAccessLayer
         void UpdateFoodTruckCompany(FoodTruckCompany foodTruckCompany);
 
         List<FoodTruckCompany> SearchFoodTruckCompany(FoodTruckCompanySearchCriteria criteria);
-        
-           void DeactivateFoodTruckCompany(int foodTruckCompanyId);
     }
 }
