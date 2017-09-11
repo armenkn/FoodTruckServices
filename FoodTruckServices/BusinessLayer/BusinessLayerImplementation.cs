@@ -3,6 +3,7 @@ using FoodTruckServices.Model;
 using FoodTruckServices.Interfaces;
 using FoodTruckServices.DataAccessLayer;
 using System.Threading.Tasks;
+using System;
 
 namespace FoodTruckServices
 {
@@ -13,17 +14,20 @@ namespace FoodTruckServices
         private readonly IAddressSqlAccess _addressSqlAccess;
         private readonly ICoordinationServiceProvider _coordinationServiceProvider;
         private readonly IContactSqlAccess _contactSqlAccess;
+        private readonly IUserSqlAccess _userSqlAccess;
 
         public BusinessLayerImplementation(IFoodTruckCompanySqlAccess foodTruckCompanySqlAccess, 
             IFoodTruckSqlAccess foodTruckSqlAccess, IAddressSqlAccess addressSqlAccess,
             ICoordinationServiceProvider coordinationServiceProvider,
-            IContactSqlAccess contactSqlAccess)
+            IContactSqlAccess contactSqlAccess,
+            IUserSqlAccess userSqlAccess)
         {
             _foodTruckCompanySqlAccess = foodTruckCompanySqlAccess;
             _foodTruckSqlAccess = foodTruckSqlAccess;
             _addressSqlAccess = addressSqlAccess;
             _coordinationServiceProvider = coordinationServiceProvider;
             _contactSqlAccess = contactSqlAccess;
+            _userSqlAccess = userSqlAccess;
         }
 
         public void InsertWorkDayHour(WorkingDayHour workingDayHour)
@@ -131,6 +135,57 @@ namespace FoodTruckServices
         public void UpdateContact(ContactInfo contact)
         {
             _contactSqlAccess.UpdateContact(contact);
+        }
+
+        public int CreateUser(User user)
+        {
+            return _userSqlAccess.CreateUser(user);
+        }
+
+        public User GetUserById(int userId)
+        {
+            return _userSqlAccess.GetUserById(userId);
+        }
+
+        public void UpdateUser(User user)
+        {
+            _userSqlAccess.UpdateUser(user);
+        }
+
+        public List<User> GetUsersByRoleId(int userRoleId)
+        {
+            List<User> result = null;
+            try
+            {
+                var userRole = (UserRoleEnum)userRoleId;
+                result = _userSqlAccess.GetUserListByUserRole(userRole);
+            }
+            catch(Exception ex)
+            {
+
+            }
+            return result;
+        }
+
+        public UserLoginResultEnum Login(string username, string password)
+        {
+            //Todo: Hash Password
+            var hashedPassword = password;
+            var loginResult = _userSqlAccess.Login(username, hashedPassword);
+            if (loginResult.Item1 != UserLoginResultEnum.Success || 
+                loginResult.Item2 == 0)
+                return UserLoginResultEnum.InvalidCredentials;
+
+            var accessToken = Guid.NewGuid().ToString();
+            var refreshToken = Guid.NewGuid().ToString();
+            var accessTokenExpirationDate = DateTime.Now.AddMinutes(Constants.Tokens.AccessTokenExpirationMinutes);
+            var refreshTokenExpirationDate = DateTime.Now.AddMinutes(Constants.Tokens.RefreshTokenExpirationMinutes);
+
+            var insertTokenResponse = _userSqlAccess.InsertTokensForUser(loginResult.Item2, accessToken, refreshToken, accessTokenExpirationDate, refreshTokenExpirationDate);
+
+            if (insertTokenResponse != DatabaseResponse.Success)
+                return UserLoginResultEnum.UnableToLogin;
+            return UserLoginResultEnum.Success;
         }
 
         #endregion

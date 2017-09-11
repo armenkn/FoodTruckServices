@@ -31,5 +31,10 @@ namespace FoodTruckServices.Interfaces
         void UpdateContact(ContactInfo contact);
 
 
+        int CreateUser(User user);
+        User GetUserById(int userId);
+        void UpdateUser(User user);
+        List<User> GetUsersByRoleId(int userRoleId);
+        UserLoginResultEnum Login(string username, string password);
     }
 }
