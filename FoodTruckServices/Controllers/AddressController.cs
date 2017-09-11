@@ -36,8 +36,8 @@ namespace FoodTruckServices.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody]Address address)
         {
-            int AddressId = await _dataAccess.CreateAddress(address);
-            return Created($"{_resourceUrl}{AddressId}", AddressId);
+            int addressId = await _dataAccess.CreateAddress(address);
+            return Created($"{_resourceUrl}{addressId}", addressId);
         }
 
         /// <summary>
@@ -48,6 +48,7 @@ namespace FoodTruckServices.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromBody]Address address)
         {
+            address.AddressID = id;
             _dataAccess.UpdateAddress(address);
             return Ok();
         }

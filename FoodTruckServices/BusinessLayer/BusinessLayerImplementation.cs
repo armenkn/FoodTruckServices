@@ -12,14 +12,18 @@ namespace FoodTruckServices
         private readonly IFoodTruckSqlAccess _foodTruckSqlAccess;
         private readonly IAddressSqlAccess _addressSqlAccess;
         private readonly ICoordinationServiceProvider _coordinationServiceProvider;
+        private readonly IContactSqlAccess _contactSqlAccess;
+
         public BusinessLayerImplementation(IFoodTruckCompanySqlAccess foodTruckCompanySqlAccess, 
             IFoodTruckSqlAccess foodTruckSqlAccess, IAddressSqlAccess addressSqlAccess,
-            ICoordinationServiceProvider coordinationServiceProvider)
+            ICoordinationServiceProvider coordinationServiceProvider,
+            IContactSqlAccess contactSqlAccess)
         {
             _foodTruckCompanySqlAccess = foodTruckCompanySqlAccess;
             _foodTruckSqlAccess = foodTruckSqlAccess;
             _addressSqlAccess = addressSqlAccess;
             _coordinationServiceProvider = coordinationServiceProvider;
+            _contactSqlAccess = contactSqlAccess;
         }
 
         public void InsertWorkDayHour(WorkingDayHour workingDayHour)
@@ -112,6 +116,21 @@ namespace FoodTruckServices
         public DatabaseResponse DeleteAddress(int id)
         {
             return _addressSqlAccess.DeleteAddress(id);
+        }
+
+        public int CreateContact(ContactInfo contact)
+        {
+            return _contactSqlAccess.CreateContact(contact);
+        }
+
+        public ContactInfo GetContactById(int contactId)
+        {
+            return _contactSqlAccess.GetContactById(contactId);
+        }
+
+        public void UpdateContact(ContactInfo contact)
+        {
+            _contactSqlAccess.UpdateContact(contact);
         }
 
         #endregion

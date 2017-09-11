@@ -52,6 +52,7 @@ namespace FoodTruckServices
             services.AddTransient<IFoodTruckSqlAccess, FoodTruckSqlAccessImplementation>();
             services.AddTransient<ICoordinationServiceProvider, CoordinationServiceProviderImplementation>();
             services.AddTransient<IBusiness, BusinessLayerImplementation>();
+            services.AddTransient<IContactSqlAccess, ContactSqlAccessImplementation>();
             
         }
 
