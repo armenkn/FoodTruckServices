@@ -35,6 +35,6 @@ namespace FoodTruckServices.Interfaces
         User GetUserById(int userId);
         void UpdateUser(User user);
         List<User> GetUsersByRoleId(int userRoleId);
-        UserLoginResultEnum Login(string username, string password);
+        UserLoginResponse Login(string username, string password);
     }
 }

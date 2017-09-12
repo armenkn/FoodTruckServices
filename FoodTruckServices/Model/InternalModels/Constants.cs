@@ -14,6 +14,19 @@ namespace FoodTruckServices.Model
         {
             public const int AccessTokenExpirationMinutes = 20;
             public const int RefreshTokenExpirationMinutes = 7200; //5days
+            public const string Algorithm = "HS256";
+            public const string Type = "JWT";
+            
+
+            public static class Providers
+            {
+                public const string AdminTokenProvider = "AdminTokenProvider";
+            }
+        }
+
+        public static class Cache
+        {
+            public const string TokenSecret = "TokenSecret";
         }
 
         public static class Errors

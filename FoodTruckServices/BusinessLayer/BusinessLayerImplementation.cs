@@ -14,13 +14,15 @@ namespace FoodTruckServices
         private readonly IAddressSqlAccess _addressSqlAccess;
         private readonly ICoordinationServiceProvider _coordinationServiceProvider;
         private readonly IContactSqlAccess _contactSqlAccess;
-        private readonly IUserSqlAccess _userSqlAccess;
+        private readonly IUserDataAccess _userSqlAccess;
+        private readonly ITokenProvider _tokenProvider; 
 
         public BusinessLayerImplementation(IFoodTruckCompanySqlAccess foodTruckCompanySqlAccess, 
             IFoodTruckSqlAccess foodTruckSqlAccess, IAddressSqlAccess addressSqlAccess,
             ICoordinationServiceProvider coordinationServiceProvider,
             IContactSqlAccess contactSqlAccess,
-            IUserSqlAccess userSqlAccess)
+            IUserDataAccess userSqlAccess,
+            ITokenProvider tokenProvider)
         {
             _foodTruckCompanySqlAccess = foodTruckCompanySqlAccess;
             _foodTruckSqlAccess = foodTruckSqlAccess;
@@ -28,6 +30,7 @@ namespace FoodTruckServices
             _coordinationServiceProvider = coordinationServiceProvider;
             _contactSqlAccess = contactSqlAccess;
             _userSqlAccess = userSqlAccess;
+            _tokenProvider = tokenProvider;
         }
 
         public void InsertWorkDayHour(WorkingDayHour workingDayHour)
@@ -167,27 +170,51 @@ namespace FoodTruckServices
             return result;
         }
 
-        public UserLoginResultEnum Login(string username, string password)
+        public UserLoginResponse Login(string username, string password)
         {
             //Todo: Hash Password
+            var result = new UserLoginResponse()
+            {
+                LoginResult = UserLoginResultEnum.None
+            };
+
             var hashedPassword = password;
             var loginResult = _userSqlAccess.Login(username, hashedPassword);
-            if (loginResult.Item1 != UserLoginResultEnum.Success || 
-                loginResult.Item2 == 0)
-                return UserLoginResultEnum.InvalidCredentials;
 
-            var accessToken = Guid.NewGuid().ToString();
+            if (loginResult.Item1 != UserLoginResultEnum.Success ||
+                loginResult.Item2 == null || loginResult.Item2.UserId == 0)
+            {
+                result.LoginResult = UserLoginResultEnum.InvalidCredentials;
+                return result;
+            }
+
+            var accessToken = _tokenProvider.CreateToken(
+                Constants.Tokens.Algorithm, Constants.Tokens.Type,
+                loginResult.Item2,
+                _userSqlAccess.GetTokenProviderSecret(Constants.Tokens.Providers.AdminTokenProvider));
+
             var refreshToken = Guid.NewGuid().ToString();
+
             var accessTokenExpirationDate = DateTime.Now.AddMinutes(Constants.Tokens.AccessTokenExpirationMinutes);
             var refreshTokenExpirationDate = DateTime.Now.AddMinutes(Constants.Tokens.RefreshTokenExpirationMinutes);
 
-            var insertTokenResponse = _userSqlAccess.InsertTokensForUser(loginResult.Item2, accessToken, refreshToken, accessTokenExpirationDate, refreshTokenExpirationDate);
+            var insertTokenDatabaseResponse = _userSqlAccess.InsertTokensForUser(
+                                                                loginResult.Item2.UserId, accessToken, refreshToken, 
+                                                                accessTokenExpirationDate, refreshTokenExpirationDate);
 
-            if (insertTokenResponse != DatabaseResponse.Success)
-                return UserLoginResultEnum.UnableToLogin;
-            return UserLoginResultEnum.Success;
+            if (insertTokenDatabaseResponse == DatabaseResponse.Success)
+            {
+                result.LoginResult = UserLoginResultEnum.Success;
+                result.JWT = accessToken;
+                result.UserId = loginResult.Item2.UserId;
+
+                return result;
+            }
+            else
+                return result;
         }
 
+        
         #endregion
     }
 }

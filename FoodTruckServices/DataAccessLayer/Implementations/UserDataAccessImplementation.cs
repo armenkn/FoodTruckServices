@@ -5,11 +5,19 @@ using System.Threading.Tasks;
 using FoodTruckServices.Model;
 using System.Data.SqlClient;
 using System.Data;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace FoodTruckServices.DataAccessLayer.Implementations
 {
-    public class UserSqlAccessImplementation : IUserSqlAccess
+    public class UserDataAccessImplementation : IUserDataAccess
     {
+        private IMemoryCache _memoryCache;
+
+        public UserDataAccessImplementation(IMemoryCache memoryCache)
+        {
+            _memoryCache = memoryCache;
+        }
+
         public int CreateUser(User user)
         {
             var result = 0;
@@ -24,12 +32,14 @@ namespace FoodTruckServices.DataAccessLayer.Implementations
                         cmd.CommandType = CommandType.StoredProcedure;
                         cmd.Parameters.AddWithValue("@Username", user.Username);
                         cmd.Parameters.AddWithValue("@HashedPassword", user.HashedPassword);
-                        cmd.Parameters.AddWithValue("@UserTypeId", (int)user.UserRole);
+                        cmd.Parameters.AddWithValue("@UserRoleId", (int)user.UserRole);
                         cmd.Parameters.AddWithValue("@FirstName", user.FirstName);
                         cmd.Parameters.AddWithValue("@MiddleName", user.MiddleName);
                         cmd.Parameters.AddWithValue("@LastName", user.LastName);
                         cmd.Parameters.AddWithValue("@SSN", user.SSN);
-                        cmd.Parameters.AddWithValue("@DateOfBirth", user.DateOfBirth);
+                 
+                        if (user.DateOfBirth.HasValue)
+                            cmd.Parameters.AddWithValue("@DateOfBirth", user.DateOfBirth);
                         cmd.Parameters.AddWithValue("@UserId", Constants.UserId);
 
                         var returnValue = new SqlParameter("@ReturnValue", SqlDbType.Int);
@@ -97,10 +107,11 @@ namespace FoodTruckServices.DataAccessLayer.Implementations
         {
 
         }
-        public Tuple<UserLoginResultEnum, int> Login(string username, string hashedPassword)
+
+        public Tuple<UserLoginResultEnum, User> Login(string username, string hashedPassword)
         {
             var loginResult = UserLoginResultEnum.None;
-            var userId = 0;
+            User user = new User();
 
             using (var sqlConn = new SqlConnection(Utilities.GetDefaultConnectionString()))
             {
@@ -110,22 +121,20 @@ namespace FoodTruckServices.DataAccessLayer.Implementations
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@Username", username);
                     cmd.Parameters.AddWithValue("@HashedPassword", hashedPassword);
-
-                    var returnValue = new SqlParameter("@ReturnValue", SqlDbType.Int);
-                    returnValue.Direction = ParameterDirection.Output;
-                    cmd.Parameters.Add(returnValue);
-
+                    
                     sqlConn.Open();
                     var reader = cmd.ExecuteReader();
 
-                    userId = int.Parse(returnValue.Value.ToString());
+                    ReadUserFromReader(user, reader);
                 }
             }
 
-            if (userId == 0)
+            if (user.UserId == 0)
                 loginResult = UserLoginResultEnum.InvalidCredentials;
+            else
+                loginResult = UserLoginResultEnum.Success;
 
-            return new Tuple<UserLoginResultEnum, int>(loginResult, userId);
+            return new Tuple<UserLoginResultEnum, User>(loginResult, user);
         }
 
         public DatabaseResponse InsertTokensForUser(int userId, string accessToken, string refreshToken, DateTime accessTokenExpiratonDate, DateTime refreshTokenExpirationDate)
@@ -163,6 +172,34 @@ namespace FoodTruckServices.DataAccessLayer.Implementations
             return result;
         }
 
+        public string GetTokenProviderSecret(string tokenProvider)
+        {
+            var secret = "";
+            if(_memoryCache.TryGetValue(Constants.Cache.TokenSecret, out secret))
+            {
+                return secret;
+            }
+            using (var sqlConn = new SqlConnection(Utilities.GetDefaultConnectionString()))
+            {
+                var spName = "GetTokenProviderSecret";
+                using (var cmd = new SqlCommand(spName, sqlConn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@TokenProvider", tokenProvider);
+                    sqlConn.Open();
+                    var reader = cmd.ExecuteReader();
+                    if(reader.Read())
+                    {
+                        secret = reader["Secret"].ToString();
+                    }
+                }
+            }
+
+            _memoryCache.Set(Constants.Cache.TokenSecret, secret);
+
+            return secret;
+        }
+
         #region Private methods
         private static void ReadUserFromReader(User result, SqlDataReader reader)
         {
@@ -175,12 +212,11 @@ namespace FoodTruckServices.DataAccessLayer.Implementations
                 result.MiddleName = reader["MiddleName"].ToString();
                 result.SSN = reader["SSN"].ToString();
                 result.UserRole = (UserRoleEnum)int.Parse(reader["UserRoleId"].ToString());
-                result.DateOfBirth = DateTime.Parse(reader["DateOfBirth"].ToString());
+                if(!string.IsNullOrEmpty(reader["DateOfBirth"].ToString()))
+                    result.DateOfBirth = DateTime.Parse(reader["DateOfBirth"].ToString());
             }
         }
-
-      
-
+        
         #endregion
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FoodTruckServices.DataAccessLayer
 {
-    public interface IUserSqlAccess
+    public interface IUserDataAccess
     {
 
         int CreateUser(User user);
@@ -15,8 +15,10 @@ namespace FoodTruckServices.DataAccessLayer
 
         List<User> GetUserListByUserRole(UserRoleEnum userRole);
 
-        Tuple<UserLoginResultEnum, int> Login(string username, string hashedPassword);
+        Tuple<UserLoginResultEnum, User> Login(string username, string hashedPassword);
 
         DatabaseResponse InsertTokensForUser(int userId, string accessToken, string refreshToken, DateTime accessTokenExpirationDate, DateTime refreshTokenExpirationDate);
+
+        string GetTokenProviderSecret(string tokenProvider);
     }
 }

@@ -14,6 +14,11 @@ namespace FoodTruckServices.Controllers
         private readonly IBusiness _dataAccess;
         private const string _resourceUrl = "/api/User/";
 
+        public UserController(IBusiness dataAccess)
+        {
+            _dataAccess = dataAccess;
+        }
+
         public IActionResult Index()
         {
             return View();
@@ -47,13 +52,14 @@ namespace FoodTruckServices.Controllers
             return Ok(users);
         }
 
-        [HttpPost("/login/{username}/{password}")]
+        [HttpPost("login/{username}/{password}")]
         public IActionResult Login(string username, string password)
         {
             var loginResult = _dataAccess.Login(username, password);
-            if (loginResult != UserLoginResultEnum.Success)
+            if (loginResult == null || loginResult.LoginResult != UserLoginResultEnum.Success)
                 return Unauthorized();
-            return Ok();
+
+            return Ok(loginResult.JWT);
         }
 
 

@@ -33,7 +33,7 @@ namespace FoodTruckServices.Model
         [RegularExpression(@"^[0-9]{9}$")]
         public string SSN { get; set; }
 
-        public DateTime DateOfBirth { get; set; }
+        public DateTime? DateOfBirth { get; set; }
 
         public UserRoleEnum UserRole { get; set; }
     }

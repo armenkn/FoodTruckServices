@@ -7,6 +7,7 @@ using FoodTruckServices.DataAccessLayer;
 using FoodTruckServices.DataAccessLayer.Implementations;
 using FoodTruckServices.Interfaces;
 using FoodTruckServices.ExternalServices;
+using FoodTruckServices.BusinessLayer;
 
 namespace FoodTruckServices
 {
@@ -53,6 +54,10 @@ namespace FoodTruckServices
             services.AddTransient<ICoordinationServiceProvider, CoordinationServiceProviderImplementation>();
             services.AddTransient<IBusiness, BusinessLayerImplementation>();
             services.AddTransient<IContactSqlAccess, ContactSqlAccessImplementation>();
+            services.AddTransient<IUserDataAccess, UserDataAccessImplementation>();
+            services.AddTransient<ITokenProvider, JWTokenProvider>();
+
+            services.AddMemoryCache();
             
         }
 
