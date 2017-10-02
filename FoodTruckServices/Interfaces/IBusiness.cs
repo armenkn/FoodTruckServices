@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Primitives;
 
 namespace FoodTruckServices.Interfaces
 {
@@ -25,7 +26,6 @@ namespace FoodTruckServices.Interfaces
         Task<int> CreateAddress(Address address);        
         void UpdateAddress(Address address);
         DatabaseResponse DeleteAddress(int id);
-
         int CreateContact(ContactInfo contact);
         ContactInfo GetContactById(int contactId);
         void UpdateContact(ContactInfo contact);
@@ -36,5 +36,6 @@ namespace FoodTruckServices.Interfaces
         void UpdateUser(User user);
         List<User> GetUsersByRoleId(int userRoleId);
         UserLoginResponse Login(string username, string password);
+        Tuple<AuthenticatedUser, TokenResponseEnum> ValidateToken(string token);
     }
 }

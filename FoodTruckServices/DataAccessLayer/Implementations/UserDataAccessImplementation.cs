@@ -175,7 +175,7 @@ namespace FoodTruckServices.DataAccessLayer.Implementations
         public string GetTokenProviderSecret(string tokenProvider)
         {
             var secret = "";
-            if(_memoryCache.TryGetValue(Constants.Cache.TokenSecret, out secret))
+            if(_memoryCache.TryGetValue(tokenProvider, out secret))
             {
                 return secret;
             }
@@ -195,7 +195,7 @@ namespace FoodTruckServices.DataAccessLayer.Implementations
                 }
             }
 
-            _memoryCache.Set(Constants.Cache.TokenSecret, secret);
+            _memoryCache.Set(tokenProvider, secret);
 
             return secret;
         }

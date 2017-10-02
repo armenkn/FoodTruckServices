@@ -8,6 +8,8 @@ namespace FoodTruckServices.Interfaces
 {
     public interface ITokenProvider
     {
-        string CreateToken(string algorithm, string type, User user, string secret);
+        string CreateToken(User user, string secret);
+
+        Tuple<AuthenticatedUser, TokenResponseEnum> ValidateToken(string token, string secret);
     }
 }

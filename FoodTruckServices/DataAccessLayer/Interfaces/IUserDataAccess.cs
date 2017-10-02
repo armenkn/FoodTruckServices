@@ -20,5 +20,6 @@ namespace FoodTruckServices.DataAccessLayer
         DatabaseResponse InsertTokensForUser(int userId, string accessToken, string refreshToken, DateTime accessTokenExpirationDate, DateTime refreshTokenExpirationDate);
 
         string GetTokenProviderSecret(string tokenProvider);
+                
     }
 }

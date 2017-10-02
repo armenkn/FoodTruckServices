@@ -55,6 +55,21 @@ namespace FoodTruckServices
 
             return result;
         }
+
+        public static string EncodeObject<T>(this T originalObject)
+        {
+            var encodedObjectBytes = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(originalObject));
+            var encodedObject = System.Convert.ToBase64String(encodedObjectBytes);
+            return encodedObject;
+        }
+
+        public static T DecodeObject<T>(string encodedObject)
+        {
+            var convertedFromBase64 = Convert.FromBase64CharArray(encodedObject.ToCharArray(), 0, encodedObject.Length);
+            var serializedObject = System.Text.Encoding.UTF8.GetString(convertedFromBase64);
+            T originalObject = JsonConvert.DeserializeObject<T>(serializedObject);
+            return originalObject;
+        }
     }
 }
 

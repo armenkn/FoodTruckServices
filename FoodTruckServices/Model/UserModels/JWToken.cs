@@ -22,11 +22,14 @@ namespace FoodTruckServices.Model
     }
 
     public class Payload
-    {
-        public string Username { get; set; }
+    {        
+        public int UserId { get; set; }
 
-        public string UserRoleId { get; set; }
+        public int UserRoleId { get; set; }
 
+        public DateTime CreateDateTime { get; set; }
+
+        public int LifespanMins { get; set; }
     }
     
 }

@@ -189,7 +189,6 @@ namespace FoodTruckServices
             }
 
             var accessToken = _tokenProvider.CreateToken(
-                Constants.Tokens.Algorithm, Constants.Tokens.Type,
                 loginResult.Item2,
                 _userSqlAccess.GetTokenProviderSecret(Constants.Tokens.Providers.AdminTokenProvider));
 
@@ -214,7 +213,12 @@ namespace FoodTruckServices
                 return result;
         }
 
-        
+        public Tuple<AuthenticatedUser, TokenResponseEnum> ValidateToken(string authHeader)
+        {
+            return _tokenProvider.ValidateToken(authHeader, _userSqlAccess.GetTokenProviderSecret(Constants.Tokens.Providers.AdminTokenProvider));
+        }
+
+
         #endregion
     }
 }

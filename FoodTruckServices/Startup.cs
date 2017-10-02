@@ -8,6 +8,7 @@ using FoodTruckServices.DataAccessLayer.Implementations;
 using FoodTruckServices.Interfaces;
 using FoodTruckServices.ExternalServices;
 using FoodTruckServices.BusinessLayer;
+using FoodTruckServices.Filters;
 
 namespace FoodTruckServices
 {
@@ -56,6 +57,13 @@ namespace FoodTruckServices
             services.AddTransient<IContactSqlAccess, ContactSqlAccessImplementation>();
             services.AddTransient<IUserDataAccess, UserDataAccessImplementation>();
             services.AddTransient<ITokenProvider, JWTokenProvider>();
+
+            //services.AddMvc(x =>
+            //{
+            //    x.Filters.Add(new AuthFilter());
+            //});
+
+            services.AddScoped<AuthFilter>();
 
             services.AddMemoryCache();
             

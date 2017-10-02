@@ -5,9 +5,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using FoodTruckServices.Model;
 using FoodTruckServices.Interfaces;
+using FoodTruckServices.Filters;
 
 namespace FoodTruckServices.Controllers
 {
+    [ServiceFilter(typeof(AuthFilter))]
     [Route("api/[controller]")]
     public class UserController : Controller
     {
@@ -55,9 +57,10 @@ namespace FoodTruckServices.Controllers
         [HttpPost("login/{username}/{password}")]
         public IActionResult Login(string username, string password)
         {
-            var loginResult = _dataAccess.Login(username, password);
+           var loginResult = _dataAccess.Login(username, password);
             if (loginResult == null || loginResult.LoginResult != UserLoginResultEnum.Success)
                 return Unauthorized();
+            var item = HttpContext.Items.FirstOrDefault(x => x.Key == Constants.Tokens.UserInfo).Value;
 
             return Ok(loginResult.JWT);
         }

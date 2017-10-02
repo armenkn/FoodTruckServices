@@ -204,7 +204,7 @@ namespace FoodTruckServices.DataAccessLayer.Implementations
                 }
             }
         }
-        
+
 
         #region Private methods
         private static void ReadFoodTrackCompanyInfoFromReader(FoodTruckCompany result, SqlDataReader reader)
@@ -229,54 +229,55 @@ namespace FoodTruckServices.DataAccessLayer.Implementations
                     MiddleName = reader["OwnerMiddleName"].ToString(),
                     LastName = reader["OwnerLastName"].ToString(),
                     SSN = reader["OwnerSSN"].ToString(),
-                    DateOfBirth = DateTime.Parse(reader["OwnerDateOfBirth"].ToString()),
+                    //DateOfBirth = string.IsNullOrEmpty(reader["OwnerDateOfBirth"].ToString()) ? 
+                    //            DateTime.Parse(reader["OwnerDateOfBirth"].ToString()) : null,
                     Role = (PersonRoleEnum)(int.Parse(reader["OwnerRoleID"].ToString()))
                 };
-                result.OwnerInfo = ownerInfo;
-            }
+            result.OwnerInfo = ownerInfo;
+        }
 
-            reader.NextResult();
+        reader.NextResult();
 
             result.OfficeLocations = new List<Location>();
 
             while (reader.Read())
             {
                 var location = new Location();
-                location.LocationID = int.Parse(reader["LocationId"].ToString());
+        location.LocationID = int.Parse(reader["LocationId"].ToString());
 
-                var address = new Address();
-                address.AddressID = int.Parse(reader["AddressId"].ToString());
-                address.Address1 = reader["Address1"].ToString();
-                address.Address2 = reader["Address2"].ToString();
-                address.AddressType = (AddressTypeEnum)int.Parse(reader["AddressTypeId"].ToString());
-                address.City = reader["City"].ToString();
+        var address = new Address();
+        address.AddressID = int.Parse(reader["AddressId"].ToString());
+        address.Address1 = reader["Address1"].ToString();
+        address.Address2 = reader["Address2"].ToString();
+        address.AddressType = (AddressTypeEnum) int.Parse(reader["AddressTypeId"].ToString());
+        address.City = reader["City"].ToString();
 
-                address.Coordination = new Coordination();
-                var latitude = reader["Latitude"].ToString();
-                address.Coordination.Latitude = (!string.IsNullOrEmpty(latitude)) ? decimal.Parse(latitude) : 0;
+        address.Coordination = new Coordination();
+        var latitude = reader["Latitude"].ToString();
+        address.Coordination.Latitude = (!string.IsNullOrEmpty(latitude)) ? decimal.Parse(latitude) : 0;
 
                 var longitude = reader["Longitude"].ToString();
-                address.Coordination.Longitude = (!string.IsNullOrEmpty(longitude)) ? decimal.Parse(longitude) : 0;
+        address.Coordination.Longitude = (!string.IsNullOrEmpty(longitude)) ? decimal.Parse(longitude) : 0;
 
                 address.State = reader["State"].ToString();
-                address.Zipcode = reader["Zipcode"].ToString();
+        address.Zipcode = reader["Zipcode"].ToString();
 
-                var phoneNumbersXml = reader["PhoneNumbers"].ToString();
-                location.PhoneNumbers = new List<Phone>();
+        var phoneNumbersXml = reader["PhoneNumbers"].ToString();
+        location.PhoneNumbers = new List<Phone>();
                 if (!string.IsNullOrEmpty(phoneNumbersXml))
                 {
                     location.PhoneNumbers = Utilities.DeserializeXmlToObject<List<Phone>>(phoneNumbersXml);
                 }
 
-                var workingDayHoursXml = reader["WorkingDayHours"].ToString();
-                location.WorkingDayHours = new List<WorkingDayHour>();
+    var workingDayHoursXml = reader["WorkingDayHours"].ToString();
+    location.WorkingDayHours = new List<WorkingDayHour>();
                 if (!string.IsNullOrEmpty(workingDayHoursXml))
                 {
                     var workingDayHoursString = Utilities.DeserializeXmlToObject<List<WorkingDayHourString>>(workingDayHoursXml);
                     foreach (var item in workingDayHoursString)
                     {
                         var workingDayHour = new WorkingDayHour();
-                        workingDayHour.WorkingDayHourID = item.WorkingDayHourID;
+    workingDayHour.WorkingDayHourID = item.WorkingDayHourID;
                         workingDayHour.DayOfWeek = item.DayOfWeek;
                         workingDayHour.OpenTime = TimeSpan.Parse($"{item.OpenTimeHours}:{item.OpenTimeMinutes}");
                         workingDayHour.CloseTime = TimeSpan.Parse($"{item.CloseTimeHours}:{item.CloseTimeMinutes}");
@@ -301,7 +302,7 @@ namespace FoodTruckServices.DataAccessLayer.Implementations
                     DisplayOrder = int.Parse(reader["DisplayOrder"].ToString())
                 };
 
-                result.Contacts.Add(contactInfo);
+result.Contacts.Add(contactInfo);
             }
 
             reader.NextResult();
@@ -329,14 +330,14 @@ namespace FoodTruckServices.DataAccessLayer.Implementations
             while (reader.Read())
             {
                 var foodTruck = new FoodTruck();
-                foodTruck.FoodTruckID = int.Parse(reader["FoodTruckId"].ToString());
-                foodTruck.Name = reader["FoodTruckName"].ToString();
-                foodTruck.StartDate = DateTime.Parse(reader["FoodTruckStartDate"].ToString());
+foodTruck.FoodTruckID = int.Parse(reader["FoodTruckId"].ToString());
+foodTruck.Name = reader["FoodTruckName"].ToString();
+foodTruck.StartDate = DateTime.Parse(reader["FoodTruckStartDate"].ToString());
                 foodTruck.TruckMake = reader["FoodTruckTruckMake"].ToString();
-                foodTruck.TruckModel = reader["FoodTruckTruckModel"].ToString();
-                foodTruck.Year = int.Parse(reader["FoodTruckYear"].ToString());
-                foodTruck.Color = reader["FoodTruckColor"].ToString();
-                foodTruck.CookInfo = new PersonalInfo();
+foodTruck.TruckModel = reader["FoodTruckTruckModel"].ToString();
+foodTruck.Year = int.Parse(reader["FoodTruckYear"].ToString());
+foodTruck.Color = reader["FoodTruckColor"].ToString();
+foodTruck.CookInfo = new PersonalInfo();
 
                 if (reader["FoodTruckCookID"] != null && !string.IsNullOrEmpty(reader["FoodTruckCookID"].ToString()))
                     foodTruck.CookInfo.PersonalInfoID = int.Parse(reader["FoodTruckCookID"].ToString());
@@ -349,14 +350,14 @@ namespace FoodTruckServices.DataAccessLayer.Implementations
                 if (reader["FoodTruckCookPersonalInfoID"] != null && !string.IsNullOrEmpty(reader["FoodTruckCookPersonalInfoID"].ToString()))
                     foodTruck.CookInfo.PersonalInfoID = int.Parse(reader["FoodTruckCookPersonalInfoID"].ToString());
                 if (reader["FoodTruckCookRoleId"] != null && !string.IsNullOrEmpty(reader["FoodTruckCookRoleId"].ToString()))
-                    foodTruck.CookInfo.Role = (PersonRoleEnum)int.Parse(reader["FoodTruckCookRoleId"].ToString());
+                    foodTruck.CookInfo.Role = (PersonRoleEnum) int.Parse(reader["FoodTruckCookRoleId"].ToString());
                 if (reader["FoodTruckCookSSN"] != null && !string.IsNullOrEmpty(reader["FoodTruckCookSSN"].ToString()))
                     foodTruck.CookInfo.SSN = reader["FoodTruckCookSSN"].ToString();
                 if (reader["FoodTruckCookDateOfBirth"] != null && !string.IsNullOrEmpty(reader["FoodTruckCookDateOfBirth"].ToString()))
                     foodTruck.CookInfo.DateOfBirth = DateTime.Parse(reader["FoodTruckCookDateOfBirth"].ToString());
-                foodTruck.CuisineCategory = (CuisineCategoryEnum)int.Parse(reader["FoodTruckCuisineCategoryId"].ToString());
-                foodTruck.Description = reader["FoodTruckDescription"].ToString();
-                foodTruck.Driver = new PersonalInfo();
+                foodTruck.CuisineCategory = (CuisineCategoryEnum) int.Parse(reader["FoodTruckCuisineCategoryId"].ToString());
+foodTruck.Description = reader["FoodTruckDescription"].ToString();
+foodTruck.Driver = new PersonalInfo();
                 if (reader["FoodTruckDriverID"] != null && !string.IsNullOrEmpty(reader["FoodTruckDriverID"].ToString()))
                     foodTruck.Driver.PersonalInfoID = int.Parse(reader["FoodTruckDriverID"].ToString());
                 if (reader["FoodTruckDriverFirstName"] != null && !string.IsNullOrEmpty(reader["FoodTruckDriverFirstName"].ToString()))
@@ -368,16 +369,16 @@ namespace FoodTruckServices.DataAccessLayer.Implementations
                 if (reader["FoodTruckDriverPersonalInfoID"] != null && !string.IsNullOrEmpty(reader["FoodTruckDriverPersonalInfoID"].ToString()))
                     foodTruck.Driver.PersonalInfoID = int.Parse(reader["FoodTruckDriverPersonalInfoID"].ToString());
                 if (reader["FoodTruckDriverRoleId"] != null && !string.IsNullOrEmpty(reader["FoodTruckDriverRoleId"].ToString()))
-                    foodTruck.Driver.Role = (PersonRoleEnum)int.Parse(reader["FoodTruckDriverRoleId"].ToString());
+                    foodTruck.Driver.Role = (PersonRoleEnum) int.Parse(reader["FoodTruckDriverRoleId"].ToString());
                 if (reader["FoodTruckDriverSSN"] != null && !string.IsNullOrEmpty(reader["FoodTruckDriverSSN"].ToString()))
                     foodTruck.Driver.SSN = reader["FoodTruckDriverSSN"].ToString();
                 if (reader["FoodTruckDriverDateOfBirth"] != null && !string.IsNullOrEmpty(reader["FoodTruckDriverDateOfBirth"].ToString()))
                     foodTruck.Driver.DateOfBirth = DateTime.Parse(reader["FoodTruckDriverDateOfBirth"].ToString());
                 foodTruck.HealthCode = reader["FoodTruckHealthCode"].ToString();
-                foodTruck.LicensePlate = reader["FoodTruckLicensePlate"].ToString();
-                foodTruck.MaxCapacityPerMeal = int.Parse(reader["FoodTruckMaxCapacityPerMeal"].ToString());
-                foodTruck.MealType = (MealTypeEnum)int.Parse(reader["FoodTruckMealTypeId"].ToString());
-                result.FoodTrucks.Add(foodTruck);
+foodTruck.LicensePlate = reader["FoodTruckLicensePlate"].ToString();
+foodTruck.MaxCapacityPerMeal = int.Parse(reader["FoodTruckMaxCapacityPerMeal"].ToString());
+foodTruck.MealType = (MealTypeEnum) int.Parse(reader["FoodTruckMealTypeId"].ToString());
+result.FoodTrucks.Add(foodTruck);
             }
 
             reader.NextResult();

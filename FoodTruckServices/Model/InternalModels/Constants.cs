@@ -16,6 +16,7 @@ namespace FoodTruckServices.Model
             public const int RefreshTokenExpirationMinutes = 7200; //5days
             public const string Algorithm = "HS256";
             public const string Type = "JWT";
+            public const string UserInfo = "userinfo";
             
 
             public static class Providers
@@ -26,7 +27,7 @@ namespace FoodTruckServices.Model
 
         public static class Cache
         {
-            public const string TokenSecret = "TokenSecret";
+
         }
 
         public static class Errors
