@@ -1,5 +1,6 @@
 ﻿using FoodTruckServices.Interfaces;
 using FoodTruckServices.Model;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Newtonsoft.Json;
 using System;
@@ -27,9 +28,11 @@ namespace FoodTruckServices.Filters
 
         public void OnActionExecuting(ActionExecutingContext context)
         {
-            if (context.HttpContext.Request.Headers.ContainsKey(_authHeaderKey))
+            if (!context.HttpContext.Request.Headers.ContainsKey(_authHeaderKey))
             {
                 context.HttpContext.Response.StatusCode = 403;
+                context.Result = new EmptyResult();
+                return;
             }
             var authHeader = context.HttpContext.Request.Headers.Single(x => x.Key == _authHeaderKey).Value;
 
@@ -38,14 +41,20 @@ namespace FoodTruckServices.Filters
             if(tokenValidationResult == null || tokenValidationResult.Item2 == TokenResponseEnum.InvalidToken)
             {
                 context.HttpContext.Response.StatusCode = 403;
+                context.Result = new EmptyResult();
+                return;
             }
             else if(tokenValidationResult.Item2 == TokenResponseEnum.TokenExpired)
             {
                 context.HttpContext.Response.StatusCode = 401;
+                context.Result = new EmptyResult();
+                return;
             }
             else if (tokenValidationResult.Item1.UserId == 0)
             {
                 context.HttpContext.Response.StatusCode = 403;
+                context.Result = new EmptyResult();
+                return;
             }
             else
             {

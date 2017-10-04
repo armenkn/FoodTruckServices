@@ -40,7 +40,9 @@ namespace FoodTruckServices.BusinessLayer
 
             var encodedHeaderPayload = $"{encodedHeader}.{encodedPayload}";
 
-            if (encodedHeaderPayload != signature)
+            var hashString = ComputeHashStirng(encodedHeaderPayload, secret);
+
+            if (hashString != signature)
             {
                 return new Tuple<AuthenticatedUser, TokenResponseEnum>(null, TokenResponseEnum.InvalidToken);
             }
