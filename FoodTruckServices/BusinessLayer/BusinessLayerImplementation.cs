@@ -4,6 +4,9 @@ using FoodTruckServices.Interfaces;
 using FoodTruckServices.DataAccessLayer;
 using System.Threading.Tasks;
 using System;
+using Microsoft.AspNetCore.Http;
+using System.Linq;
+using FoodTruckServices.Model.Exceptions;
 
 namespace FoodTruckServices
 {
@@ -15,9 +18,19 @@ namespace FoodTruckServices
         private readonly ICoordinationServiceProvider _coordinationServiceProvider;
         private readonly IContactSqlAccess _contactSqlAccess;
         private readonly IUserDataAccess _userSqlAccess;
-        private readonly ITokenProvider _tokenProvider; 
+        private readonly ITokenProvider _tokenProvider;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public BusinessLayerImplementation(IFoodTruckCompanySqlAccess foodTruckCompanySqlAccess, 
+        private AuthenticatedUser _authenticatedUser
+        {
+            get
+            {
+                return (AuthenticatedUser)_httpContextAccessor.HttpContext.Items.FirstOrDefault(x => x.Key == Constants.Tokens.UserInfo).Value;
+            }
+        }
+
+        public BusinessLayerImplementation(IHttpContextAccessor httpContextAccessor,
+            IFoodTruckCompanySqlAccess foodTruckCompanySqlAccess, 
             IFoodTruckSqlAccess foodTruckSqlAccess, IAddressSqlAccess addressSqlAccess,
             ICoordinationServiceProvider coordinationServiceProvider,
             IContactSqlAccess contactSqlAccess,
@@ -31,132 +44,197 @@ namespace FoodTruckServices
             _contactSqlAccess = contactSqlAccess;
             _userSqlAccess = userSqlAccess;
             _tokenProvider = tokenProvider;
+            _httpContextAccessor = httpContextAccessor;
         }
+
+
 
         public void InsertWorkDayHour(WorkingDayHour workingDayHour)
         {
-            _foodTruckCompanySqlAccess.InsertWorkDayHour(workingDayHour);
+            if (_authenticatedUser.Role != UserRoleEnum.Admin)
+                throw new AuthenticationException("Invalid Role");
+
+            _foodTruckCompanySqlAccess.InsertWorkDayHour(workingDayHour, _authenticatedUser.UserId);
         }
 
 
         #region Food Truck Company
         public int CreateFoodTruckCompany(FoodTruckCompany foodTruckCompany)
         {
-            return _foodTruckCompanySqlAccess.CreateFoodTruckCompany(foodTruckCompany);
+            if (_authenticatedUser.Role != UserRoleEnum.Admin)
+                throw new AuthenticationException("Invalid Role");
+
+            return _foodTruckCompanySqlAccess.CreateFoodTruckCompany(foodTruckCompany, _authenticatedUser.UserId);
         }
         
         public FoodTruckCompany GetFoodTruckCompanyById(int foodTruckCompanyId)
         {
+            if (_authenticatedUser.Role != UserRoleEnum.Admin)
+                throw new AuthenticationException("Invalid Role");
+
             if (foodTruckCompanyId == 0)
                 return null;
 
             return _foodTruckCompanySqlAccess.GetFoodTruckCompanyById(foodTruckCompanyId);
         }
 
-
         public List<FoodTruckCompany> SearchFoodTruckCompany(FoodTruckCompanySearchCriteria criteria)
         {
+            if (_authenticatedUser.Role != UserRoleEnum.Admin)
+                throw new AuthenticationException("Invalid Role");
+
             return _foodTruckCompanySqlAccess.SearchFoodTruckCompany(criteria);
         }
 
         public void UpdateFoodTruckCompany(FoodTruckCompany foodTruckCompany)
         {
-            _foodTruckCompanySqlAccess.UpdateFoodTruckCompany(foodTruckCompany);
+            if (_authenticatedUser.Role != UserRoleEnum.Admin)
+                throw new AuthenticationException("Invalid Role");
+
+            _foodTruckCompanySqlAccess.UpdateFoodTruckCompany(foodTruckCompany, _authenticatedUser.UserId);
         }
         #endregion
 
         #region Food Truck
         public FoodTruck GetFoodTruckById(int foodTruckId)
         {
+            if (_authenticatedUser.Role != UserRoleEnum.Admin)
+                throw new AuthenticationException("Invalid Role");
+
             return _foodTruckSqlAccess.GetFoodTruckById(foodTruckId);
         }
 
         public int CreateFoodTruck(FoodTruck foodTruck)
         {
-            return _foodTruckSqlAccess.CreateFoodTruck(foodTruck);
+            if (_authenticatedUser.Role != UserRoleEnum.Admin)
+                throw new AuthenticationException("Invalid Role");
+
+            return _foodTruckSqlAccess.CreateFoodTruck(foodTruck, _authenticatedUser.UserId);
         }
 
         public void UpdateFoodTruck(FoodTruck foodTruck)
         {
-            _foodTruckSqlAccess.UpdateFoodTruck(foodTruck);
+            if (_authenticatedUser.Role != UserRoleEnum.Admin)
+                throw new AuthenticationException("Invalid Role");
+
+            _foodTruckSqlAccess.UpdateFoodTruck(foodTruck, _authenticatedUser.UserId);
         }
 
         public FoodTruck SearchFoodTruck(FoodTruckSearchCriteria criteria)
         {
+            if (_authenticatedUser.Role != UserRoleEnum.Admin)
+                throw new AuthenticationException("Invalid Role");
+
             return _foodTruckSqlAccess.SearchFoodTruck(criteria);
         }
 
         public void DeactivateFoodTruck(int id)
         {
-            _foodTruckSqlAccess.DeactivateFoodTruck(id);
+            if (_authenticatedUser.Role != UserRoleEnum.Admin)
+                throw new AuthenticationException("Invalid Role");
+
+            _foodTruckSqlAccess.DeactivateFoodTruck(id, _authenticatedUser.UserId);
         }
         #endregion
 
         #region Address
         public Address GetAddressById(int addressId)
         {
+            if (_authenticatedUser.Role != UserRoleEnum.Admin)
+                throw new AuthenticationException("Invalid Role");
+
             return _addressSqlAccess.GetAddressById(addressId);
         }
 
         public async Task<int> CreateAddress(Address address)
         {
+            if (_authenticatedUser.Role != UserRoleEnum.Admin)
+                throw new AuthenticationException("Invalid Role");
+
             if (address.Coordination == null ||
                 (address.Coordination?.Latitude == null && address.Coordination?.Longitude == null))
             {
                 var coordination = _coordinationServiceProvider.GetLatAndLongByAddress(address);
                 address.Coordination = await coordination;
             }
-            return _addressSqlAccess.CreateAddress(address);
+            return _addressSqlAccess.CreateAddress(address, _authenticatedUser.UserId);
         }
 
-        public async void UpdateAddress(Address address)
+        public async Task UpdateAddress(Address address)
         {
+            if (_authenticatedUser.Role != UserRoleEnum.Admin)
+                throw new AuthenticationException("Invalid Role");
+
             if (address.Coordination == null ||
                 (address.Coordination?.Latitude == null && address.Coordination?.Longitude == null))
             {
                 var coordination = _coordinationServiceProvider.GetLatAndLongByAddress(address);
                 address.Coordination = await coordination;
             }
-            _addressSqlAccess.UpdateAddress(address);
+            _addressSqlAccess.UpdateAddress(address, _authenticatedUser.UserId);
         }
 
         public DatabaseResponse DeleteAddress(int id)
         {
-            return _addressSqlAccess.DeleteAddress(id);
+            if (_authenticatedUser.Role != UserRoleEnum.Admin)
+                throw new AuthenticationException("Invalid Role");
+
+            return _addressSqlAccess.DeleteAddress(id, _authenticatedUser.UserId);
         }
 
         public int CreateContact(ContactInfo contact)
         {
-            return _contactSqlAccess.CreateContact(contact);
+            if (_authenticatedUser.Role != UserRoleEnum.Admin)
+                throw new AuthenticationException("Invalid Role");
+
+            return _contactSqlAccess.CreateContact(contact, _authenticatedUser.UserId);
         }
 
         public ContactInfo GetContactById(int contactId)
         {
+            if (_authenticatedUser.Role != UserRoleEnum.Admin)
+                throw new AuthenticationException("Invalid Role");
+
             return _contactSqlAccess.GetContactById(contactId);
         }
 
         public void UpdateContact(ContactInfo contact)
         {
-            _contactSqlAccess.UpdateContact(contact);
+            if (_authenticatedUser.Role != UserRoleEnum.Admin)
+                throw new AuthenticationException("Invalid Role");
+
+            _contactSqlAccess.UpdateContact(contact, _authenticatedUser.UserId);
         }
 
         public int CreateUser(User user)
         {
-            return _userSqlAccess.CreateUser(user);
+            if (_authenticatedUser.Role != UserRoleEnum.Admin)
+                throw new AuthenticationException("Invalid Role");
+
+            return _userSqlAccess.CreateUser(user, _authenticatedUser.UserId);
         }
 
         public User GetUserById(int userId)
         {
+            if (_authenticatedUser.Role != UserRoleEnum.Admin)
+                throw new AuthenticationException("Invalid Role");
+
             return _userSqlAccess.GetUserById(userId);
         }
 
         public void UpdateUser(User user)
         {
-            _userSqlAccess.UpdateUser(user);
+            if (_authenticatedUser.Role != UserRoleEnum.Admin)
+                throw new AuthenticationException("Invalid Role");
+
+            _userSqlAccess.UpdateUser(user, _authenticatedUser.UserId);
         }
 
         public List<User> GetUsersByRoleId(int userRoleId)
         {
+            if (_authenticatedUser.Role != UserRoleEnum.Admin)
+                throw new AuthenticationException("Invalid Role");
+
             List<User> result = null;
             try
             {

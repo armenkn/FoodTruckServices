@@ -3,16 +3,13 @@ namespace FoodTruckServices.Model
 {
     public static class Constants
     {
-        //todo: replace
-        public static int UserId = 1;
-
         public static string GoogleMapApiKey = "AIzaSyAfQ3Ga_MtLW7pc6ZejXVYhSpawbD9s4UY";
 
         public static string GoogleMapApiUrl = "https://maps.googleapis.com/maps/api/geocode/json?address={0}&key=" + GoogleMapApiKey;
 
         public static class Tokens
         {
-            public const int AccessTokenExpirationMinutes = 20;
+            public const int AccessTokenExpirationMinutes = 4120;
             public const int RefreshTokenExpirationMinutes = 7200; //5days
             public const string Algorithm = "HS256";
             public const string Type = "JWT";

@@ -1,9 +1,5 @@
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
-using FoodTruckServices.DataAccessLayer;
-using FoodTruckServices.DataAccessLayer.Implementations;
 using FoodTruckServices.Model;
-using System;
 using FoodTruckServices.Interfaces;
 
 namespace FoodTruckServices.Controllers

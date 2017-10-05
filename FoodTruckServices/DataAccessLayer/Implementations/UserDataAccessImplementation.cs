@@ -18,7 +18,7 @@ namespace FoodTruckServices.DataAccessLayer.Implementations
             _memoryCache = memoryCache;
         }
 
-        public int CreateUser(User user)
+        public int CreateUser(User user, int userId)
         {
             var result = 0;
             try
@@ -40,7 +40,7 @@ namespace FoodTruckServices.DataAccessLayer.Implementations
                  
                         if (user.DateOfBirth.HasValue)
                             cmd.Parameters.AddWithValue("@DateOfBirth", user.DateOfBirth);
-                        cmd.Parameters.AddWithValue("@UserId", Constants.UserId);
+                        cmd.Parameters.AddWithValue("@UserId", userId);
 
                         var returnValue = new SqlParameter("@ReturnValue", SqlDbType.Int);
                         returnValue.Direction = ParameterDirection.Output;
@@ -103,7 +103,7 @@ namespace FoodTruckServices.DataAccessLayer.Implementations
             return result;
         }
 
-        public void UpdateUser(User user)
+        public void UpdateUser(User user, int userId)
         {
 
         }

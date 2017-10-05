@@ -10,7 +10,7 @@ namespace FoodTruckServices.DataAccessLayer.Implementations
 {
     public class ContactSqlAccessImplementation : IContactSqlAccess
     {
-        public int CreateContact(ContactInfo contact)
+        public int CreateContact(ContactInfo contact, int userId)
         {
             var result = 0;
             try
@@ -24,7 +24,7 @@ namespace FoodTruckServices.DataAccessLayer.Implementations
                         cmd.Parameters.AddWithValue("@Contact", contact.Contact);
                         cmd.Parameters.AddWithValue("@ContactTypeId", (int)contact.ContactType);
                         cmd.Parameters.AddWithValue("@DisplayOrder", contact.DisplayOrder);
-                        cmd.Parameters.AddWithValue("@UserId", Constants.UserId);
+                        cmd.Parameters.AddWithValue("@UserId", userId);
                         var returnValue = new SqlParameter("@ReturnValue", SqlDbType.Int);
                         returnValue.Direction = ParameterDirection.Output;
                         cmd.Parameters.Add(returnValue);
@@ -68,7 +68,7 @@ namespace FoodTruckServices.DataAccessLayer.Implementations
 
         }
 
-        public void UpdateContact(ContactInfo contact)
+        public void UpdateContact(ContactInfo contact, int userId)
         {
             try
             {
@@ -82,7 +82,7 @@ namespace FoodTruckServices.DataAccessLayer.Implementations
                         cmd.Parameters.AddWithValue("@Contact", contact.Contact);
                         cmd.Parameters.AddWithValue("@ContactTypeId", (int)contact.ContactType);
                         cmd.Parameters.AddWithValue("@DisplayOrder", contact.DisplayOrder);
-                        cmd.Parameters.AddWithValue("@UserId", Constants.UserId);
+                        cmd.Parameters.AddWithValue("@UserId", userId);
                         
                         sqlConn.Open();
                         cmd.ExecuteNonQuery();

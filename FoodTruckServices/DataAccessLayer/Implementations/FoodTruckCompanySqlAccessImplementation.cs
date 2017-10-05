@@ -13,7 +13,7 @@ namespace FoodTruckServices.DataAccessLayer.Implementations
         {
         }
 
-        public int CreateFoodTruckCompany(FoodTruckCompany foodTruckCompany)
+        public int CreateFoodTruckCompany(FoodTruckCompany foodTruckCompany, int userId)
         {
             var result = 0;
             using (var sqlConn = new SqlConnection(Utilities.GetDefaultConnectionString()))
@@ -64,7 +64,7 @@ namespace FoodTruckServices.DataAccessLayer.Implementations
                         cmd.Parameters.AddWithValue("@CuisineCategoryIDs", string.Join(",", foodTruckCompany.CuisineCategories.Select(x => (int)x).ToList()));
                     }
 
-                    cmd.Parameters.AddWithValue("@UserId", Constants.UserId);
+                    cmd.Parameters.AddWithValue("@UserId", userId);
                     var returnValue = new SqlParameter("@ReturnValue", SqlDbType.Int);
                     returnValue.Direction = ParameterDirection.Output;
                     cmd.Parameters.Add(returnValue);
@@ -105,8 +105,9 @@ namespace FoodTruckServices.DataAccessLayer.Implementations
             return result;
         }
 
-        public void InsertWorkDayHour(WorkingDayHour workingDayHour)
-        {
+        public void InsertWorkDayHour(WorkingDayHour workingDayHour, int userId)
+        {          
+
             using (var sqlConn = new SqlConnection(Utilities.GetDefaultConnectionString()))
             {
                 var spName = "InsertWorkingDayHour";
@@ -119,7 +120,7 @@ namespace FoodTruckServices.DataAccessLayer.Implementations
                     cmd.Parameters.AddWithValue("@OpenTimeMinutes", workingDayHour.OpenTime.Minutes);
                     cmd.Parameters.AddWithValue("@CloseTimeHours", workingDayHour.CloseTime.Hours);
                     cmd.Parameters.AddWithValue("@CloseTimeMinutes", workingDayHour.CloseTime.Minutes);
-                    cmd.Parameters.AddWithValue("@UserId", 1);
+                    cmd.Parameters.AddWithValue("@UserId", userId);
 
                     sqlConn.Open();
                     cmd.ExecuteNonQuery();
@@ -162,7 +163,7 @@ namespace FoodTruckServices.DataAccessLayer.Implementations
             return result;
         }
 
-        public void UpdateFoodTruckCompany(FoodTruckCompany foodTruckCompany)
+        public void UpdateFoodTruckCompany(FoodTruckCompany foodTruckCompany, int userId)
         {
             var result = new List<FoodTruckCompany>();
             using (var sqlConn = new SqlConnection(Utilities.GetDefaultConnectionString()))
@@ -196,7 +197,7 @@ namespace FoodTruckServices.DataAccessLayer.Implementations
                     {
                         cmd.Parameters.AddWithValue("@CuisineCategoryIDs", string.Join(",", foodTruckCompany.CuisineCategories.Select(x => (int)x).ToList()));
                     }
-                    cmd.Parameters.AddWithValue("@UserId", Constants.UserId);
+                    cmd.Parameters.AddWithValue("@UserId", userId);
 
                     sqlConn.Open();
                     cmd.ExecuteNonQuery();

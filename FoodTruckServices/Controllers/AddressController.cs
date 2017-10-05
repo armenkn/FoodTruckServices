@@ -1,31 +1,34 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using FoodTruckServices.DataAccessLayer;
 using FoodTruckServices.Model;
 using FoodTruckServices.Interfaces;
-using System.Net;
 using Microsoft.AspNetCore.Http;
+using FoodTruckServices.Model.Exceptions;
+using NLog;
+using FoodTruckServices.Filters;
+using Microsoft.Extensions.Logging;
 
 namespace FoodTruckServices.Controllers
 {
+    [ServiceFilter(typeof(AuthFilter))]
     [Route("api/[controller]")]
     public class AddressController : Controller
     {
-        private readonly IBusiness _dataAccess;
+        private readonly IBusiness _businessLayer;
         private const string _resourceUrl = "/api/Address/";
+        private readonly ILogger<AddressController> _logger;
 
-        public AddressController(IBusiness dataAccess)
+        public AddressController(IBusiness businessLayer, ILogger<AddressController> logger)
         {
-            _dataAccess = dataAccess;
+            _businessLayer = businessLayer;
+            _logger = logger;
         }
 
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
-            Address address = _dataAccess.GetAddressById(id);
+            Address address = _businessLayer.GetAddressById(id);
             if (address != null && address.AddressID != 0)
                 return Ok(address);
             else
@@ -36,7 +39,7 @@ namespace FoodTruckServices.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody]Address address)
         {
-            int addressId = await _dataAccess.CreateAddress(address);
+            int addressId = await _businessLayer.CreateAddress(address);
             return Created($"{_resourceUrl}{addressId}", addressId);
         }
 
@@ -49,15 +52,31 @@ namespace FoodTruckServices.Controllers
         public async Task<IActionResult> Put(int id, [FromBody]Address address)
         {
             address.AddressID = id;
-            _dataAccess.UpdateAddress(address);
-            return Ok();
+            try
+            {
+                await _businessLayer.UpdateAddress(address);
+                return Ok();
+            }
+            catch (AuthenticationException authEx)
+            {
+                _logger.LogError($"Location:{_resourceUrl}, Exception: {authEx.GetType().ToString()}, Message: {authEx.Message}");
+                return Unauthorized();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Location:{_resourceUrl}, Exception: {ex.GetType().ToString()}, Message: {ex.Message}");
+                return new ContentResult()
+                {
+                    StatusCode = StatusCodes.Status500InternalServerError
+                };
+            }
         }
 
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
             var databaseResponse = DatabaseResponse.None;
-            databaseResponse = _dataAccess.DeleteAddress(id);
+            databaseResponse = _businessLayer.DeleteAddress(id);
             var response = new ContentResult();
 
             switch (databaseResponse)

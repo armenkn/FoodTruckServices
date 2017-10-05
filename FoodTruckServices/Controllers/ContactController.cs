@@ -11,12 +11,12 @@ namespace FoodTruckServices.Controllers
     [Route("api/[controller]")]
     public class ContactController : Controller
     {
-        private readonly IBusiness _dataAccess;
+        private readonly IBusiness _businessLayer;
         private const string _resourceUrl = "/api/Address/";
 
-        public ContactController(IBusiness dataAccess)
+        public ContactController(IBusiness businessLayer)
         {
-            _dataAccess = dataAccess;
+            _businessLayer = businessLayer;
         }
 
         public IActionResult Index()
@@ -27,7 +27,7 @@ namespace FoodTruckServices.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] ContactInfo contact)
         {
-            int contactId = _dataAccess.CreateContact(contact);
+            int contactId = _businessLayer.CreateContact(contact);
             return Created($"{_resourceUrl}{contactId}", contactId);
 
         }
@@ -36,14 +36,14 @@ namespace FoodTruckServices.Controllers
         public IActionResult Put(int id, [FromBody] ContactInfo contact)
         {
             contact.ContactInfoID = id;
-            _dataAccess.UpdateContact(contact);
+            _businessLayer.UpdateContact(contact);
             return Ok();
         }
 
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
-            ContactInfo contact= _dataAccess.GetContactById(id);
+            ContactInfo contact= _businessLayer.GetContactById(id);
             if (contact != null && contact.ContactInfoID != 0)
                 return Ok(contact);
             else

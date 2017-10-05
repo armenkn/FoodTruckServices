@@ -10,10 +10,12 @@ namespace FoodTruckServices.DataAccessLayer
     {
         FoodTruck GetFoodTruckById(int foodTruckId);
 
-        int CreateFoodTruck(FoodTruck foodTruck);
+        int CreateFoodTruck(FoodTruck foodTruck, int userId);
 
-        void UpdateFoodTruck(FoodTruck foodTruck);
+        void UpdateFoodTruck(FoodTruck foodTruck, int userId);
+
         FoodTruck  SearchFoodTruck(FoodTruckSearchCriteria criteria);
-        void DeactivateFoodTruck(int id);
+
+        void DeactivateFoodTruck(int id, int userId);
     }
 }

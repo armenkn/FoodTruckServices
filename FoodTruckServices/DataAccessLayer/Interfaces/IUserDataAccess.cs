@@ -8,10 +8,11 @@ namespace FoodTruckServices.DataAccessLayer
 {
     public interface IUserDataAccess
     {
+        int CreateUser(User user, int userId);
 
-        int CreateUser(User user);
         User GetUserById(int userId);
-        void UpdateUser(User user);
+
+        void UpdateUser(User user, int userId);
 
         List<User> GetUserListByUserRole(UserRoleEnum userRole);
 

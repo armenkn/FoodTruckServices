@@ -13,12 +13,12 @@ namespace FoodTruckServices.Controllers
     [Route("api/[controller]")]
     public class UserController : Controller
     {
-        private readonly IBusiness _dataAccess;
+        private readonly IBusiness _businessLayer;
         private const string _resourceUrl = "/api/User/";
 
-        public UserController(IBusiness dataAccess)
+        public UserController(IBusiness businessLayer)
         {
-            _dataAccess = dataAccess;
+            _businessLayer = businessLayer;
         }
 
         public IActionResult Index()
@@ -29,14 +29,14 @@ namespace FoodTruckServices.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] User user)
         {
-            int userId = _dataAccess.CreateUser(user);
+            int userId = _businessLayer.CreateUser(user);
             return Created($"{_resourceUrl}{userId}", userId);
         }
 
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
-            var user = _dataAccess.GetUserById(id);
+            var user = _businessLayer.GetUserById(id);
             if (user != null && user.UserId != 0)
                 return Ok(user);
             else
@@ -46,7 +46,7 @@ namespace FoodTruckServices.Controllers
         [HttpGet("/role/{userRoleId}")]
         public IActionResult GetByRole(int userRoleId)
         {
-            List<User> users = _dataAccess.GetUsersByRoleId(userRoleId);
+            List<User> users = _businessLayer.GetUsersByRoleId(userRoleId);
             if(users == null || users.Count == 0)
             {
                 return NotFound();
@@ -54,16 +54,16 @@ namespace FoodTruckServices.Controllers
             return Ok(users);
         }
 
-        [HttpPost("login/{username}/{password}")]
-        public IActionResult Login(string username, string password)
-        {
-           var loginResult = _dataAccess.Login(username, password);
-            if (loginResult == null || loginResult.LoginResult != UserLoginResultEnum.Success)
-                return Unauthorized();
-            var item = HttpContext.Items.FirstOrDefault(x => x.Key == Constants.Tokens.UserInfo).Value;
+        //[HttpPost("login/{username}/{password}")]
+        //public IActionResult Login(string username, string password)
+        //{
+        //   var loginResult = _dataAccess.Login(username, password);
+        //    if (loginResult == null || loginResult.LoginResult != UserLoginResultEnum.Success)
+        //        return Unauthorized();
+        //    var item = HttpContext.Items.FirstOrDefault(x => x.Key == Constants.Tokens.UserInfo).Value;
 
-            return Ok(loginResult.JWT);
-        }
+        //    return Ok(loginResult.JWT);
+        //}
 
 
     }

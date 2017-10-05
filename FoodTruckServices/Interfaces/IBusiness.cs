@@ -24,7 +24,7 @@ namespace FoodTruckServices.Interfaces
 
         Address GetAddressById(int addressId);
         Task<int> CreateAddress(Address address);        
-        void UpdateAddress(Address address);
+        Task UpdateAddress(Address address);
         DatabaseResponse DeleteAddress(int id);
         int CreateContact(ContactInfo contact);
         ContactInfo GetContactById(int contactId);

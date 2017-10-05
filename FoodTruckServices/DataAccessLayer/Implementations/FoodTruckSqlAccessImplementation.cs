@@ -8,12 +8,12 @@ namespace FoodTruckServices.DataAccessLayer.Implementations
 {
     public class FoodTruckSqlAccessImplementation : IFoodTruckSqlAccess
     {
-        public int CreateFoodTruck(FoodTruck foodTruck)
+        public int CreateFoodTruck(FoodTruck foodTruck, int userId)
         {
             throw new NotImplementedException();
         }
 
-        public void DeactivateFoodTruck(int id)
+        public void DeactivateFoodTruck(int id, int userId)
         {
             throw new NotImplementedException();
         }
@@ -28,7 +28,7 @@ namespace FoodTruckServices.DataAccessLayer.Implementations
             throw new NotImplementedException();
         }
 
-        public void UpdateFoodTruck(FoodTruck foodTruck)
+        public void UpdateFoodTruck(FoodTruck foodTruck, int userId)
         {
             throw new NotImplementedException();
         }

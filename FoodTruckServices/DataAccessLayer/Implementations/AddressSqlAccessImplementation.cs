@@ -10,7 +10,7 @@ namespace FoodTruckServices.DataAccessLayer.Implementations
 {
     public class AddressSqlAccessImplementation : IAddressSqlAccess
     {
-        public int CreateAddress(Address address)
+        public int CreateAddress(Address address, int userId)
         {
             var result = 0;
             try
@@ -35,7 +35,7 @@ namespace FoodTruckServices.DataAccessLayer.Implementations
                             if (address.Coordination.Longitude != 0)
                                 cmd.Parameters.AddWithValue("@Longitude", address.Coordination?.Longitude);
                         }
-                        cmd.Parameters.AddWithValue("@UserId", Constants.UserId);
+                        cmd.Parameters.AddWithValue("@UserId", userId);
                         var returnValue = new SqlParameter("@ReturnValue", SqlDbType.Int);
                         returnValue.Direction = ParameterDirection.Output;
                         cmd.Parameters.Add(returnValue);
@@ -53,7 +53,7 @@ namespace FoodTruckServices.DataAccessLayer.Implementations
             return result;
        }
 
-        public DatabaseResponse DeleteAddress(int id)
+        public DatabaseResponse DeleteAddress(int id, int userId)
         {
             var result = DatabaseResponse.None;
             using (var sqlConn = new SqlConnection(Utilities.GetDefaultConnectionString()))
@@ -113,7 +113,7 @@ namespace FoodTruckServices.DataAccessLayer.Implementations
             return result;
         }
 
-        public void UpdateAddress(Address address)
+        public void UpdateAddress(Address address, int userId)
         {
             try
             {
@@ -138,7 +138,7 @@ namespace FoodTruckServices.DataAccessLayer.Implementations
                             if (address.Coordination.Longitude != 0)
                                 cmd.Parameters.AddWithValue("@Longitude", address.Coordination?.Longitude);
                         }
-                        cmd.Parameters.AddWithValue("@UserId", Constants.UserId);
+                        cmd.Parameters.AddWithValue("@UserId", userId);
                         
                         sqlConn.Open();
                         cmd.ExecuteNonQuery();

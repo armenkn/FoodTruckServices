@@ -8,8 +8,10 @@ namespace FoodTruckServices.DataAccessLayer
 {
     public interface IContactSqlAccess
     {
-        int CreateContact(ContactInfo contact);
+        int CreateContact(ContactInfo contact, int userId);
+
         ContactInfo GetContactById(int contactId);
-        void UpdateContact(ContactInfo contact);
+
+        void UpdateContact(ContactInfo contact, int userId);
     }
 }

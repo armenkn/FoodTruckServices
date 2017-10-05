@@ -9,6 +9,9 @@ using FoodTruckServices.Interfaces;
 using FoodTruckServices.ExternalServices;
 using FoodTruckServices.BusinessLayer;
 using FoodTruckServices.Filters;
+using NLog.Extensions.Logging;
+using NLog.Web;
+using Microsoft.AspNetCore.Http;
 
 namespace FoodTruckServices
 {
@@ -27,6 +30,7 @@ namespace FoodTruckServices
             Configuration = builder.Build();
 
             ConnectionString = Configuration.GetValue<string>("ConnectionString:DefaultConnectionString");
+            env.ConfigureNLog("nlog.config");
         }
 
         public IConfigurationRoot Configuration { get; }
@@ -56,7 +60,7 @@ namespace FoodTruckServices
             services.AddTransient<IBusiness, BusinessLayerImplementation>();
             services.AddTransient<IContactSqlAccess, ContactSqlAccessImplementation>();
             services.AddTransient<IUserDataAccess, UserDataAccessImplementation>();
-            services.AddTransient<ITokenProvider, JWTokenProvider>();
+            services.AddTransient<ITokenProvider, JWTokenProvider>();            
 
             //services.AddMvc(x =>
             //{
@@ -66,16 +70,16 @@ namespace FoodTruckServices
             services.AddScoped<AuthFilter>();
 
             services.AddMemoryCache();
-            
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-            loggerFactory.AddDebug();
-
-            app.UseMvc();
+            loggerFactory.AddNLog();
+            app.AddNLogWeb();
+            app.UseMvc();          
         }
     }
 }

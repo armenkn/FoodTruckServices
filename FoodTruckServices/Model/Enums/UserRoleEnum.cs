@@ -8,6 +8,10 @@ namespace FoodTruckServices.Model
     public enum UserRoleEnum
     {
         None = 0,
-        Admin =1
+        Admin = 1,
+        TruckDriver = 2,
+        CompanyOwner = 3,
+        AppUser = 4,
+        Other = 100
     }
 }

@@ -34,7 +34,7 @@ namespace FoodTruckServices.Filters
                 context.Result = new EmptyResult();
                 return;
             }
-            var authHeader = context.HttpContext.Request.Headers.Single(x => x.Key == _authHeaderKey).Value;
+            var authHeader = context.HttpContext.Request.Headers.Single(x => string.Equals(x.Key,_authHeaderKey, StringComparison.OrdinalIgnoreCase)).Value;
 
             var tokenValidationResult = _business.ValidateToken(authHeader);
             

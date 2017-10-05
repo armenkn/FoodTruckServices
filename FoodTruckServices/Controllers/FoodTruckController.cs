@@ -13,18 +13,18 @@ namespace FoodTruckServices.Controllers
     [Route("api/[controller]")]
     public class FoodTruckController : Controller
     {
-        private readonly IBusiness _dataAccess;
+        private readonly IBusiness _businessLayer;
         private const string _resourceUrl = "/api/FoodTruck/";
 
-        public FoodTruckController(IBusiness dataAccess)
+        public FoodTruckController(IBusiness businessLayer)
         {
-            _dataAccess = dataAccess;
+            _businessLayer = businessLayer;
         }
 
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
-            var foodTruck = _dataAccess.GetFoodTruckById(id);
+            var foodTruck = _businessLayer.GetFoodTruckById(id);
             return Ok(foodTruck);
         }
 
@@ -32,7 +32,7 @@ namespace FoodTruckServices.Controllers
         [HttpPost]
         public IActionResult Post([FromBody]FoodTruck foodTruck)
         {
-            var foodTruckId = _dataAccess.CreateFoodTruck(foodTruck);
+            var foodTruckId = _businessLayer.CreateFoodTruck(foodTruck);
             return Created($"{_resourceUrl}{foodTruckId}", foodTruckId);
         }
 
@@ -44,7 +44,7 @@ namespace FoodTruckServices.Controllers
         [HttpPut]
         public IActionResult Put([FromBody]FoodTruck foodTruck)
         {
-            _dataAccess.UpdateFoodTruck(foodTruck);
+            _businessLayer.UpdateFoodTruck(foodTruck);
             return Ok();
         }
 
@@ -54,14 +54,14 @@ namespace FoodTruckServices.Controllers
         [HttpGet]
         public IActionResult Search([FromBody]FoodTruckSearchCriteria criteria)
         {
-            var searchResult = _dataAccess.SearchFoodTruck(criteria);
+            var searchResult = _businessLayer.SearchFoodTruck(criteria);
             return Ok(searchResult);
         }
 
         [HttpPut("{id}/Deactivate")]
         public IActionResult Deactivate(int id)
         {
-            _dataAccess.DeactivateFoodTruck(id);
+            _businessLayer.DeactivateFoodTruck(id);
             return Ok();
 
         }
