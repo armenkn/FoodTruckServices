@@ -14,8 +14,12 @@ namespace FoodTruckServices.DataAccessLayer
 
         void UpdateFoodTruck(FoodTruck foodTruck, int userId);
 
-        FoodTruck  SearchFoodTruck(FoodTruckSearchCriteria criteria);
+        FoodTruck SearchFoodTruck(FoodTruckSearchCriteria criteria);
 
         void DeactivateFoodTruck(int id, int userId);
+
+        #region App
+        void ActivateFoodTruck(int foodTruckUserId, decimal latitude, decimal longitude);
+        #endregion
     }
 }

@@ -26,7 +26,7 @@ namespace FoodTruckServices.Controllers
             return View();
         }
 
-        [HttpPost]
+        [HttpPost()]
         public IActionResult Post([FromBody] User user)
         {
             int userId = _businessLayer.CreateUser(user);

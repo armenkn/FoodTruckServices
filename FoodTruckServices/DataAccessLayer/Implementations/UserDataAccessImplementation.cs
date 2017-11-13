@@ -15,7 +15,7 @@ namespace FoodTruckServices.DataAccessLayer.Implementations
 
         public UserDataAccessImplementation(IMemoryCache memoryCache)
         {
-            _memoryCache = memoryCache;
+               _memoryCache = memoryCache;
         }
 
         public int CreateUser(User user, int userId)
@@ -57,7 +57,6 @@ namespace FoodTruckServices.DataAccessLayer.Implementations
             {
             }
             return result;
-
         }
 
         public User GetUserById(int userId)

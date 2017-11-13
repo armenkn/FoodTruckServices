@@ -18,6 +18,7 @@ namespace FoodTruckServices
         private readonly ICoordinationServiceProvider _coordinationServiceProvider;
         private readonly IContactSqlAccess _contactSqlAccess;
         private readonly IUserDataAccess _userSqlAccess;
+        private readonly IAppUserDataAccess _appUserDataAccess;
         private readonly ITokenProvider _tokenProvider;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
@@ -30,12 +31,13 @@ namespace FoodTruckServices
         }
 
         public BusinessLayerImplementation(IHttpContextAccessor httpContextAccessor,
-            IFoodTruckCompanySqlAccess foodTruckCompanySqlAccess, 
+            IFoodTruckCompanySqlAccess foodTruckCompanySqlAccess,
             IFoodTruckSqlAccess foodTruckSqlAccess, IAddressSqlAccess addressSqlAccess,
             ICoordinationServiceProvider coordinationServiceProvider,
             IContactSqlAccess contactSqlAccess,
             IUserDataAccess userSqlAccess,
-            ITokenProvider tokenProvider)
+            ITokenProvider tokenProvider,
+            IAppUserDataAccess appUserDataAccess)
         {
             _foodTruckCompanySqlAccess = foodTruckCompanySqlAccess;
             _foodTruckSqlAccess = foodTruckSqlAccess;
@@ -45,6 +47,7 @@ namespace FoodTruckServices
             _userSqlAccess = userSqlAccess;
             _tokenProvider = tokenProvider;
             _httpContextAccessor = httpContextAccessor;
+            _appUserDataAccess = appUserDataAccess;
         }
 
 
@@ -66,7 +69,7 @@ namespace FoodTruckServices
 
             return _foodTruckCompanySqlAccess.CreateFoodTruckCompany(foodTruckCompany, _authenticatedUser.UserId);
         }
-        
+
         public FoodTruckCompany GetFoodTruckCompanyById(int foodTruckCompanyId)
         {
             if (_authenticatedUser.Role != UserRoleEnum.Admin)
@@ -241,7 +244,7 @@ namespace FoodTruckServices
                 var userRole = (UserRoleEnum)userRoleId;
                 result = _userSqlAccess.GetUserListByUserRole(userRole);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
 
             }
@@ -276,7 +279,7 @@ namespace FoodTruckServices
             var refreshTokenExpirationDate = DateTime.Now.AddMinutes(Constants.Tokens.RefreshTokenExpirationMinutes);
 
             var insertTokenDatabaseResponse = _userSqlAccess.InsertTokensForUser(
-                                                                loginResult.Item2.UserId, accessToken, refreshToken, 
+                                                                loginResult.Item2.UserId, accessToken, refreshToken,
                                                                 accessTokenExpirationDate, refreshTokenExpirationDate);
 
             if (insertTokenDatabaseResponse == DatabaseResponse.Success)
@@ -295,7 +298,26 @@ namespace FoodTruckServices
         {
             return _tokenProvider.ValidateToken(authHeader, _userSqlAccess.GetTokenProviderSecret(Constants.Tokens.Providers.AdminTokenProvider));
         }
+        #endregion
 
+        #region App
+        public void ActivateFoodTruck(decimal latitude, decimal longitude)
+        {
+            var foodTruckUserId = _authenticatedUser.UserId;
+            _foodTruckSqlAccess.ActivateFoodTruck(foodTruckUserId, latitude, longitude);
+        }
+
+        public List<FoodTruckBasicInfo> UpdateAppUserLocation(bool isPushNotification, decimal latitude, decimal longitude)
+        {
+            var appUserId = _authenticatedUser.UserId;
+            return _appUserDataAccess.UpdateAppUserLocation(appUserId, isPushNotification, latitude, longitude);
+
+        }
+
+        public int CreateAppUser(User user, Coordination coordination)
+        {
+            return _appUserDataAccess.CreateAppUser(user, coordination.Latitude, coordination.Longitude);
+        }
 
         #endregion
     }

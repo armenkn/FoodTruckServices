@@ -7,6 +7,10 @@ namespace FoodTruckServices.Model
 
         public static string GoogleMapApiUrl = "https://maps.googleapis.com/maps/api/geocode/json?address={0}&key=" + GoogleMapApiKey;
 
+        public static int DefaultUserId = 0;
+
+        public static float DefaultMapRadiusMiles = 0.2F;
+
         public static class Tokens
         {
             public const int AccessTokenExpirationMinutes = 4120;

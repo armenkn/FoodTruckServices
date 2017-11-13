@@ -29,13 +29,21 @@ namespace FoodTruckServices.Interfaces
         int CreateContact(ContactInfo contact);
         ContactInfo GetContactById(int contactId);
         void UpdateContact(ContactInfo contact);
-
-
+        
         int CreateUser(User user);
         User GetUserById(int userId);
         void UpdateUser(User user);
         List<User> GetUsersByRoleId(int userRoleId);
         UserLoginResponse Login(string username, string password);
         Tuple<AuthenticatedUser, TokenResponseEnum> ValidateToken(string token);
+
+        #region App
+        void ActivateFoodTruck(decimal latitude, decimal longitude);
+
+        List<FoodTruckBasicInfo> UpdateAppUserLocation(bool isPushNotification, decimal latitude, decimal longitude);
+
+        int CreateAppUser(User user, Coordination coordination);
+
+        #endregion
     }
 }

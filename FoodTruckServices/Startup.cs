@@ -61,6 +61,7 @@ namespace FoodTruckServices
             services.AddTransient<IContactSqlAccess, ContactSqlAccessImplementation>();
             services.AddTransient<IUserDataAccess, UserDataAccessImplementation>();
             services.AddTransient<ITokenProvider, JWTokenProvider>();            
+            services.AddTransient<IAppUserDataAccess, AppUserDataAccess>();
 
             //services.AddMvc(x =>
             //{
